@@ -3,6 +3,7 @@
 
 int main() {
     sf::RenderWindow window(sf::VideoMode({1080,1080}), "CPPHead");
+    window.setFramerateLimit(60);
     window.setView(sf::View{ {}, static_cast<sf::Vector2f>(window.getSize())});
 
     sf::Texture playerTexture("assets/textures/Owlet_Monster_Walk_6.png");
