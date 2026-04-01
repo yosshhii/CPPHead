@@ -7,11 +7,9 @@ int main() {
     sf::CircleShape shape{50};
     shape.setOrigin({shape.getRadius(),shape.getRadius()});
 
-    sf::Texture texture("Owlet_Monster.png");
+    sf::Texture texture("assets/textures/Owlet_Monster.png");
     sf::Sprite sprite{texture};
     sprite.setScale({3,2});
-    //sprite.setOrigin(sf::Vector2f{sprite.getScale().x * texture.getSize().x,
-                                  // sprite.getScale().y * texture.getSize().y} / 2.f);
 
     sf::Clock clock{};
     float speed = 200;
