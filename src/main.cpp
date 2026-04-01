@@ -1,3 +1,4 @@
+#include <iostream>
 #include <SFML/Graphics.hpp>
 
 int main() {
@@ -35,10 +36,10 @@ int main() {
 
         sf::Vector2f movement{};
         if (window.hasFocus()) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {movement.x += 1;}
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {movement.x -= 1;}
-           // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {movement.y -= 1;}
-           // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {movement.y += 1;}
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::D) ) {movement.x += 1;}
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::A)) {movement.x -= 1;}
+           // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W)) {movement.y -= 1;}
+           // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S)) {movement.y += 1;}
         }
 
         //playerSprite.setPosition(playerSprite.getPosition()+movement * speed * dt );
