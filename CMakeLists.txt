@@ -13,4 +13,8 @@ add_executable(CPPHead src/main.cpp
 find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System)
 target_link_libraries(CPPHead PRIVATE SFML::Graphics SFML::Window SFML::System)
 
-file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
+add_custom_command(TARGET CPPHead POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_SOURCE_DIR}/assets
+		${CMAKE_BINARY_DIR}/assets
+)
