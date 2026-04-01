@@ -5,9 +5,13 @@ int main() {
     sf::RenderWindow window(sf::VideoMode({1080,1080}), "CPPHead");
     window.setView(sf::View{ {}, static_cast<sf::Vector2f>(window.getSize())});
 
-    sf::Texture playerTexture("assets/textures/Owlet_Monster.png");
+    sf::Texture playerTexture("assets/textures/Owlet_Monster_Walk_6.png");
     sf::Sprite playerSprite{playerTexture};
     playerSprite.setScale({3,2});
+    playerSprite.setPosition({0, 200 });
+
+    int frameWidth = 32;
+    int frameHeight = 32;
 
     sf::Texture background("assets/textures/Hills.psd");
     sf::Sprite backgroundSprite1{background};
@@ -23,6 +27,10 @@ int main() {
     sf::Clock clock{};
     float speed = 200;
     float backgroundSpeed = 100.0f;
+
+    int currentFrame = 0;
+    float animationTimer = 0.f;
+    float animationSpeed = 0.12f;
 
     bool isRunning = true;
     while (isRunning) {
@@ -42,6 +50,21 @@ int main() {
            // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S)) {movement.y += 1;}
         }
 
+        bool isMoving = (movement.x != 0 || movement.y != 0);
+
+        if (isMoving) {
+            animationTimer += dt;
+            if (animationTimer >= animationSpeed) {
+                animationTimer = 0.f;
+                currentFrame = (currentFrame + 1) % 6;
+                playerSprite.setTextureRect(sf::IntRect({currentFrame * frameWidth, 0}, {frameWidth, frameHeight}));
+            }
+        }
+
+        if (!isMoving) {
+            playerSprite.setTextureRect(sf::IntRect({5 * frameWidth, 0}, {frameWidth, frameHeight}));
+        }
+
         //playerSprite.setPosition(playerSprite.getPosition()+movement * speed * dt );
 
         backgroundSprite1.setPosition(backgroundSprite1.getPosition() - movement * speed * dt);
@@ -54,6 +77,7 @@ int main() {
             backgroundSprite2.setPosition({backgroundSprite1.getPosition().x + backgroundWidth, -backgroundHeight/2 - 100});
         }
 
+        animationTimer += dt;
 
         window.clear();
         window.draw(backgroundSprite1);
