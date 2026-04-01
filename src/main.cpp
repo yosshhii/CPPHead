@@ -70,11 +70,19 @@ int main() {
         backgroundSprite1.setPosition(backgroundSprite1.getPosition() - movement * speed * dt);
         backgroundSprite2.setPosition({backgroundSprite2.getPosition() - movement * speed * dt});
 
+        float rightLimit = window.getSize().x / 2.f;
+
         if (backgroundSprite1.getPosition().x + backgroundWidth <= -1060) {
             backgroundSprite1.setPosition({backgroundSprite2.getPosition().x + backgroundWidth, -backgroundHeight/2 - 100 });
         }
         if (backgroundSprite2.getPosition().x + backgroundWidth <= -1060) {
             backgroundSprite2.setPosition({backgroundSprite1.getPosition().x + backgroundWidth, -backgroundHeight/2 - 100});
+        }
+        if (backgroundSprite1.getPosition().x >= rightLimit) {
+            backgroundSprite1.setPosition({backgroundSprite2.getPosition().x - backgroundWidth, -backgroundHeight/2 - 100 });
+        }
+        if (backgroundSprite2.getPosition().x >= rightLimit) {
+            backgroundSprite2.setPosition({backgroundSprite1.getPosition().x - backgroundWidth, -backgroundHeight/2 - 100});
         }
 
         animationTimer += dt;
