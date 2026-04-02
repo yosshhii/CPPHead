@@ -40,9 +40,18 @@ int main() {
     float animationTimer = 0.f;
     float animationSpeed = 0.12f;
 
-    float velocityY = 0.f;
     float gravity = 1500.f;
     float jumpForce = -600.f;
+    float maxFallSpeed = 800.f;
+    sf::Vector2f velocity{0.f, 0.f};
+
+    sf::Image collisionMap ("assets/textures/HillsFloor.jpg");
+    sf::Texture ground("assets/textures/Background3.png");
+    sf::Sprite groundSprite1{ground}, groundSprite2{ground};
+    groundSprite1.setScale({2.5, 2.5});
+    groundSprite2.setScale({2.5, 2.5});
+    groundSprite1.setPosition({0, -backgroundHeight/2 - 100});
+    groundSprite2.setPosition({-backgroundWidth, -backgroundHeight/2 - 100});
 
     bool isOnGround = true;
 
@@ -62,28 +71,11 @@ int main() {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::A)) {movement.x -= 1; playerSprite.setScale({-3.f, 2.f});}
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Space) && isOnGround) {
-                velocityY = jumpForce;
+                velocity.y = jumpForce;
                 isOnGround = false;
 
                 currentFrame = 0;
                 animationTimer = 0.f;
-            }
-
-            if (!isOnGround) {
-                playerSprite.setTexture(playerJumpTexture);
-            } else {
-                playerSprite.setTexture(playerTexture);
-            }
-
-            velocityY += gravity * dt;
-            playerSprite.move({0.f, velocityY * dt});
-
-            float groundY = 200.f;
-
-            if (playerSprite.getPosition().y >= groundY) {
-                playerSprite.setPosition({playerSprite.getPosition().x, groundY});
-                velocityY = 0.f;
-                isOnGround = true;
             }
         }
 
@@ -107,6 +99,53 @@ int main() {
         backgroundSprite1.setPosition(backgroundSprite1.getPosition() - movement * speed * dt);
         backgroundSprite2.setPosition({backgroundSprite2.getPosition() - movement * speed * dt});
 
+        //Gravity and floor
+        if (!isOnGround) {
+            velocity.y += gravity * dt;
+            if (velocity.y > maxFallSpeed) velocity.y = maxFallSpeed;
+        }
+        playerSprite.move({0.f, velocity.y * dt});
+
+        sf::Vector2f feetPos = playerSprite.getPosition();
+        bool wasOnGround = isOnGround;
+        isOnGround = false;
+
+        sf::Sprite* currentFloor = nullptr;
+        if (backgroundSprite1.getGlobalBounds().contains(feetPos)) currentFloor = &backgroundSprite1;
+        else if (backgroundSprite2.getGlobalBounds().contains(feetPos)) currentFloor = &backgroundSprite2;
+
+        if (!currentFloor && wasOnGround) {
+            sf::Vector2f checkBelow = {feetPos.x, feetPos.y + 5.f};
+            if (backgroundSprite1.getGlobalBounds().contains(checkBelow)) currentFloor = &backgroundSprite1;
+            else if (backgroundSprite2.getGlobalBounds().contains(checkBelow)) currentFloor = &backgroundSprite2;
+        }
+
+        if (currentFloor) {
+            int maskX = static_cast<int>(std::round((feetPos.x - currentFloor->getPosition().x) / 2.5f));
+            int maskY = static_cast<int>(std::round((feetPos.y - currentFloor->getPosition().y) / 2.5f));
+
+            maskX = std::clamp(maskX, 0, (int)collisionMap.getSize().x - 1);
+            maskY = std::clamp(maskY, 0, (int)collisionMap.getSize().y - 1);
+
+            sf::Color pixelColor = collisionMap.getPixel({(unsigned int)maskX, (unsigned int)maskY});
+
+            if (pixelColor.r < 50) {
+                while (maskY > 0 && collisionMap.getPixel({(unsigned int)maskX, (unsigned int)(maskY - 1)}).r < 50) {
+                    maskY--;
+                }
+
+                float groundY = std::round((maskY * 2.5f) + currentFloor->getPosition().y);
+                playerSprite.setPosition({feetPos.x, groundY});
+
+                velocity.y = 0.f;
+                isOnGround = true;
+            }
+        }
+
+        if (!isOnGround) playerSprite.setTexture(playerJumpTexture);
+        else playerSprite.setTexture(playerTexture);
+        //end of gravity mechanic
+
         float rightLimit = window.getSize().x / 2.f;
 
         if (backgroundSprite1.getPosition().x + backgroundWidth <= -1060) {
@@ -121,10 +160,14 @@ int main() {
         if (backgroundSprite2.getPosition().x >= rightLimit) {
             backgroundSprite2.setPosition({backgroundSprite1.getPosition().x - backgroundWidth, -backgroundHeight/2 - 100});
         }
+        groundSprite1.setPosition(backgroundSprite1.getPosition());
+        groundSprite2.setPosition(backgroundSprite2.getPosition());
 
         window.clear();
         window.draw(backgroundSprite1);
         window.draw(backgroundSprite2);
+        window.draw(groundSprite1);
+        window.draw(groundSprite2);
         window.draw(playerSprite);
         window.display();
     }
