@@ -98,7 +98,7 @@ int main() {
             }
         }
 
-        if (!isMoving) {
+        if (!isMoving && isOnGround) {
             playerSprite.setTextureRect(sf::IntRect({5 * frameWidth, 0}, {frameWidth, frameHeight}));
         }
 
