@@ -1,10 +1,10 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+#include "engine/window.hpp"
+
 int main() {
-    sf::RenderWindow window(sf::VideoMode({1080,1080}), "CPPHead");
-    window.setFramerateLimit(60);
-    window.setView(sf::View{ {}, static_cast<sf::Vector2f>(window.getSize())});
+    sf::RenderWindow window = createWindow();
 
     int frameWidth = 32;
     int frameHeight = 32;
@@ -34,7 +34,6 @@ int main() {
 
     sf::Clock clock{};
     float speed = 200;
-    float backgroundSpeed = 100.0f;
 
     int currentFrame = 0;
     float animationTimer = 0.f;
@@ -93,8 +92,6 @@ int main() {
         if (!isMoving && isOnGround) {
             playerSprite.setTextureRect(sf::IntRect({5 * frameWidth, 0}, {frameWidth, frameHeight}));
         }
-
-        //playerSprite.setPosition(playerSprite.getPosition()+movement * speed * dt );
 
         backgroundSprite1.setPosition(backgroundSprite1.getPosition() - movement * speed * dt);
         backgroundSprite2.setPosition({backgroundSprite2.getPosition() - movement * speed * dt});
