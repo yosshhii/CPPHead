@@ -53,6 +53,7 @@ int main() {
     groundSprite2.setPosition({-backgroundWidth, -backgroundHeight/2 - 100});
 
     bool isOnGround = true;
+    bool isJumping = false;
 
     bool isRunning = true;
     while (isRunning) {
@@ -72,13 +73,14 @@ int main() {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Space) && isOnGround) {
                 velocity.y = jumpForce;
                 isOnGround = false;
+                isJumping = true;
 
                 currentFrame = 0;
                 animationTimer = 0.f;
             }
         }
 
-        bool isMoving = (movement.x != 0 || movement.y != 0);
+        bool isMoving = (movement.x != 0);
 
         if (isMoving && isOnGround) {
             animationTimer += dt;
@@ -139,8 +141,10 @@ int main() {
             }
         }
 
-        if (!isOnGround) playerSprite.setTexture(playerJumpTexture);
-        else playerSprite.setTexture(playerTexture);
+        if (!isOnGround && isJumping) {
+            playerSprite.setTexture(playerJumpTexture);
+            isJumping = false;
+        } else playerSprite.setTexture(playerTexture);
         //end of gravity mechanic
 
         float rightLimit = window.getSize().x / 2.f;
