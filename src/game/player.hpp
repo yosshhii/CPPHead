@@ -1,38 +1,31 @@
-//
-// Created by yoshi on 06.03.2026.
-//
-
-#ifndef CPP_PLAYER_H
-#define CPP_PLAYER_H
+#pragma once
+#include <SFML/Graphics.hpp>
 
 class Player {
 private:
-    float x, y;
-    float width, height;
-    float velocityX, velocityY;
-    float moveSpeed;
-    float jumpForce;
-    float gravity;
-    float maxFallSpeed;
-    bool isGrounded;
-    bool isFacingRight;
+    sf::Texture walkTexture;
+    sf::Texture jumpTexture;
+    sf::Sprite sprite;
+
+    sf::Vector2f movement{};
+
+    int frameWidth = 32;
+    int frameHeight = 32;
+
+    int currentFrame = 0;
+    float animationTimer = 0.f;
+    float animationSpeed = 0.12f;
+
+    //float x, y;
+    //float width, height;
+    float velocityY = 0.f;
+    float jumpForce = -600.f;
+    float gravity = 1500.f;
+    bool isOnGround = true;
 
 public:
-    Player(float startX, float startY, float playerWidth, float playerHeight);
-
+    void init();
     void update(float deltaTime);
-    void handleInput();
+    void handleInput(const sf::RenderWindow& window);
     void draw(sf::RenderWindow &window);
-
-    float getX() const { return x; }
-    float getY() const { return y; }
-    float getWidth() const { return width; }
-    float getHeight() const { return height; }
-    bool getGrounded() const { return isGrounded; }
-
-    void setGrounded(bool grounded) { isGrounded = grounded; }
-    void setPosition(float newX, float newY) { x = newX; y = newY; }
-    void resetVelocity() { velocityX = 0; velocityY = 0; }
 };
-
-#endif //CPP_PLAYER_H
