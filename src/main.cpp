@@ -82,18 +82,7 @@ int main() {
 
         bool isMoving = (movement.x != 0);
 
-        if (isMoving && isOnGround) {
-            animationTimer += dt;
-            if (animationTimer >= animationSpeed) {
-                animationTimer = 0.f;
-                currentFrame = (currentFrame + 1) % 6;
-                playerSprite.setTextureRect(sf::IntRect({currentFrame * frameWidth, 0}, {frameWidth, frameHeight}));
-            }
-        }
 
-        if (!isMoving && isOnGround) {
-            playerSprite.setTextureRect(sf::IntRect({5 * frameWidth, 0}, {frameWidth, frameHeight}));
-        }
 
         backgroundSprite1.setPosition(backgroundSprite1.getPosition() - movement * speed * dt);
         backgroundSprite2.setPosition({backgroundSprite2.getPosition() - movement * speed * dt});
@@ -138,14 +127,43 @@ int main() {
 
                 velocity.y = 0.f;
                 isOnGround = true;
+                isJumping = false;
             }
         }
 
-        if (!isOnGround && isJumping) {
-            playerSprite.setTexture(playerJumpTexture);
-            isJumping = false;
-        } else playerSprite.setTexture(playerTexture);
         //end of gravity mechanic
+
+        if (isJumping) {
+            playerSprite.setTexture(playerJumpTexture);
+
+            animationTimer += dt;
+            if (animationTimer >= 0.18f) {
+                animationTimer = 0.f;
+                if (currentFrame < 7) {
+                    currentFrame++;
+                }
+            }
+
+            playerSprite.setTextureRect(sf::IntRect(
+                {currentFrame * frameWidth, 0},
+                {frameWidth, frameHeight}
+            ));
+        } else if (isMoving && isOnGround) {
+            playerSprite.setTexture(playerTexture);
+
+            animationTimer += dt;
+            if (animationTimer >= animationSpeed) {
+                animationTimer = 0.f;
+                currentFrame = (currentFrame + 1) % 6;
+            }
+
+            playerSprite.setTextureRect(sf::IntRect({currentFrame * frameWidth, 0}, {frameWidth, frameHeight}));
+        } else if (isOnGround) {
+            playerSprite.setTexture(playerTexture);
+            currentFrame = 5;
+
+            playerSprite.setTextureRect(sf::IntRect({5 * frameWidth, 0}, {frameWidth, frameHeight}));
+        }
 
         float rightLimit = window.getSize().x / 2.f;
 
