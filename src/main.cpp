@@ -2,24 +2,12 @@
 #include <SFML/Graphics.hpp>
 
 #include "engine/window.hpp"
+#include "game/player.hpp"
 
 int main() {
     sf::RenderWindow window = createWindow();
 
-    int frameWidth = 32;
-    int frameHeight = 32;
-
-    sf::Texture playerTexture("assets/textures/Owlet_Monster_Walk_6.png");
-    sf::Texture playerJumpTexture("assets/textures/Owlet_Monster_Jump_8.png");
-    sf::Sprite playerSprite{playerTexture};
-    playerSprite.setScale({3,2});
-
-    playerSprite.setOrigin({
-    static_cast<float>(frameWidth) / 2.f,
-    static_cast<float>(frameHeight)
-});
-    playerSprite.setPosition({0, 200 });
-
+    Player player;
 
     sf::Texture background("assets/textures/Hills.psd");
     sf::Sprite backgroundSprite1{background};
@@ -32,17 +20,7 @@ int main() {
     backgroundSprite1.setPosition({0,-backgroundHeight/2 - 100});
     backgroundSprite2.setPosition({-backgroundWidth,-backgroundHeight/2 - 100});
 
-    sf::Clock clock{};
-    float speed = 200;
-
-    int currentFrame = 0;
-    float animationTimer = 0.f;
-    float animationSpeed = 0.12f;
-
-    float gravity = 1500.f;
-    float jumpForce = -600.f;
-    float maxFallSpeed = 800.f;
-    sf::Vector2f velocity{0.f, 0.f};
+    sf::Clock clock;
 
     sf::Image collisionMap ("assets/textures/HillsFloor.jpg");
     sf::Texture ground("assets/textures/Background3.png");
@@ -52,8 +30,7 @@ int main() {
     groundSprite1.setPosition({0, -backgroundHeight/2 - 100});
     groundSprite2.setPosition({-backgroundWidth, -backgroundHeight/2 - 100});
 
-    bool isOnGround = true;
-    bool isJumping = false;
+    float speed = 200.f;
 
     bool isRunning = true;
     while (isRunning) {
@@ -65,38 +42,17 @@ int main() {
             if (event->is<sf::Event::Resized>()) {window.setView(sf::View{ {}, static_cast<sf::Vector2f>(window.getSize())});}
         }
 
-        sf::Vector2f movement{};
-        if (window.hasFocus()) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::D) ) {movement.x += 1; playerSprite.setScale({3.f,2.f});}
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::A)) {movement.x -= 1; playerSprite.setScale({-3.f, 2.f});}
+        player.handleInput(window);
 
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Space) && isOnGround) {
-                velocity.y = jumpForce;
-                isOnGround = false;
-                isJumping = true;
-
-                currentFrame = 0;
-                animationTimer = 0.f;
-            }
-        }
-
-        bool isMoving = (movement.x != 0);
-
-
+        sf::Vector2f movement = player.getMovement();
 
         backgroundSprite1.setPosition(backgroundSprite1.getPosition() - movement * speed * dt);
         backgroundSprite2.setPosition({backgroundSprite2.getPosition() - movement * speed * dt});
 
-        //Gravity and floor
-        if (!isOnGround) {
-            velocity.y += gravity * dt;
-            if (velocity.y > maxFallSpeed) velocity.y = maxFallSpeed;
-        }
-        playerSprite.move({0.f, velocity.y * dt});
-
-        sf::Vector2f feetPos = playerSprite.getPosition();
-        bool wasOnGround = isOnGround;
-        isOnGround = false;
+        //Collision with floor
+        sf::Vector2f feetPos = player.getPosition();
+        bool wasOnGround = player.getOnGround();
+        player.setOnGround(false);
 
         sf::Sprite* currentFloor = nullptr;
         if (backgroundSprite1.getGlobalBounds().contains(feetPos)) currentFloor = &backgroundSprite1;
@@ -123,47 +79,14 @@ int main() {
                 }
 
                 float groundY = std::round((maskY * 2.5f) + currentFloor->getPosition().y);
-                playerSprite.setPosition({feetPos.x, groundY});
-
-                velocity.y = 0.f;
-                isOnGround = true;
-                isJumping = false;
+                player.setPosition({feetPos.x, groundY});
+                player.setVelocityY(0.f);
+                player.setOnGround(true);
+                player.setJumping(false);
             }
         }
 
-        //end of gravity mechanic
-
-        if (isJumping) {
-            playerSprite.setTexture(playerJumpTexture);
-
-            animationTimer += dt;
-            if (animationTimer >= 0.18f) {
-                animationTimer = 0.f;
-                if (currentFrame < 7) {
-                    currentFrame++;
-                }
-            }
-
-            playerSprite.setTextureRect(sf::IntRect(
-                {currentFrame * frameWidth, 0},
-                {frameWidth, frameHeight}
-            ));
-        } else if (isMoving && isOnGround) {
-            playerSprite.setTexture(playerTexture);
-
-            animationTimer += dt;
-            if (animationTimer >= animationSpeed) {
-                animationTimer = 0.f;
-                currentFrame = (currentFrame + 1) % 6;
-            }
-
-            playerSprite.setTextureRect(sf::IntRect({currentFrame * frameWidth, 0}, {frameWidth, frameHeight}));
-        } else if (isOnGround) {
-            playerSprite.setTexture(playerTexture);
-            currentFrame = 5;
-
-            playerSprite.setTextureRect(sf::IntRect({5 * frameWidth, 0}, {frameWidth, frameHeight}));
-        }
+        //end of collision mechanic
 
         float rightLimit = window.getSize().x / 2.f;
 
@@ -182,12 +105,15 @@ int main() {
         groundSprite1.setPosition(backgroundSprite1.getPosition());
         groundSprite2.setPosition(backgroundSprite2.getPosition());
 
+        player.handleInput(window);
+        player.update(dt);
+
         window.clear();
         window.draw(backgroundSprite1);
         window.draw(backgroundSprite2);
         window.draw(groundSprite1);
         window.draw(groundSprite2);
-        window.draw(playerSprite);
+        player.draw(window);
         window.display();
     }
     return 0;
