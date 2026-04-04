@@ -35,6 +35,7 @@ int main() {
         sf::Vector2f movement = player.getMovement();
 
         background.update(movement, dt, window);
+        player.update(dt);
 
         //Collision with floor
         sf::Vector2f feetPos = player.getPosition();
@@ -80,8 +81,6 @@ int main() {
 
         groundSprite1.setPosition(background.getSprite1().getPosition());
         groundSprite2.setPosition(background.getSprite2().getPosition());
-
-        player.update(dt);
 
         window.clear();
         background.draw(window);
