@@ -3,22 +3,13 @@
 
 #include "engine/window.hpp"
 #include "game/player.hpp"
+#include "game/background.hpp"
 
 int main() {
     sf::RenderWindow window = createWindow();
 
     Player player;
-
-    sf::Texture background("assets/textures/Hills.psd");
-    sf::Sprite backgroundSprite1{background};
-    sf::Sprite backgroundSprite2{background};
-    backgroundSprite1.setScale({2.5,2.5});
-    backgroundSprite2.setScale({2.5,2.5});
-
-    float backgroundWidth = background.getSize().x * backgroundSprite1.getScale().x;
-    float backgroundHeight = background.getSize().y * backgroundSprite1.getScale().y;
-    backgroundSprite1.setPosition({0,-backgroundHeight/2 - 100});
-    backgroundSprite2.setPosition({-backgroundWidth,-backgroundHeight/2 - 100});
+    Background background;
 
     sf::Clock clock;
 
@@ -27,10 +18,8 @@ int main() {
     sf::Sprite groundSprite1{ground}, groundSprite2{ground};
     groundSprite1.setScale({2.5, 2.5});
     groundSprite2.setScale({2.5, 2.5});
-    groundSprite1.setPosition({0, -backgroundHeight/2 - 100});
-    groundSprite2.setPosition({-backgroundWidth, -backgroundHeight/2 - 100});
-
-    float speed = 200.f;
+    groundSprite1.setPosition(background.getSprite1().getPosition());
+    groundSprite2.setPosition(background.getSprite2().getPosition());
 
     bool isRunning = true;
     while (isRunning) {
@@ -43,18 +32,19 @@ int main() {
         }
 
         player.handleInput(window);
-
         sf::Vector2f movement = player.getMovement();
 
-        backgroundSprite1.setPosition(backgroundSprite1.getPosition() - movement * speed * dt);
-        backgroundSprite2.setPosition({backgroundSprite2.getPosition() - movement * speed * dt});
+        background.update(movement, dt, window);
 
         //Collision with floor
         sf::Vector2f feetPos = player.getPosition();
         bool wasOnGround = player.getOnGround();
         player.setOnGround(false);
 
-        sf::Sprite* currentFloor = nullptr;
+        const sf::Sprite& backgroundSprite1 = background.getSprite1();
+        const sf::Sprite& backgroundSprite2 = background.getSprite2();
+
+        const sf::Sprite* currentFloor = nullptr;
         if (backgroundSprite1.getGlobalBounds().contains(feetPos)) currentFloor = &backgroundSprite1;
         else if (backgroundSprite2.getGlobalBounds().contains(feetPos)) currentFloor = &backgroundSprite2;
 
@@ -88,29 +78,13 @@ int main() {
 
         //end of collision mechanic
 
-        float rightLimit = window.getSize().x / 2.f;
+        groundSprite1.setPosition(background.getSprite1().getPosition());
+        groundSprite2.setPosition(background.getSprite2().getPosition());
 
-        if (backgroundSprite1.getPosition().x + backgroundWidth <= -1060) {
-            backgroundSprite1.setPosition({backgroundSprite2.getPosition().x + backgroundWidth, -backgroundHeight/2 - 100 });
-        }
-        if (backgroundSprite2.getPosition().x + backgroundWidth <= -1060) {
-            backgroundSprite2.setPosition({backgroundSprite1.getPosition().x + backgroundWidth, -backgroundHeight/2 - 100});
-        }
-        if (backgroundSprite1.getPosition().x >= rightLimit) {
-            backgroundSprite1.setPosition({backgroundSprite2.getPosition().x - backgroundWidth, -backgroundHeight/2 - 100 });
-        }
-        if (backgroundSprite2.getPosition().x >= rightLimit) {
-            backgroundSprite2.setPosition({backgroundSprite1.getPosition().x - backgroundWidth, -backgroundHeight/2 - 100});
-        }
-        groundSprite1.setPosition(backgroundSprite1.getPosition());
-        groundSprite2.setPosition(backgroundSprite2.getPosition());
-
-        player.handleInput(window);
         player.update(dt);
 
         window.clear();
-        window.draw(backgroundSprite1);
-        window.draw(backgroundSprite2);
+        background.draw(window);
         window.draw(groundSprite1);
         window.draw(groundSprite2);
         player.draw(window);
