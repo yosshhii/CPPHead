@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "engine/window.hpp"
+#include "engine/draw.hpp"
 #include "game/player.hpp"
 #include "game/background.hpp"
 #include "game/level.hpp"
@@ -34,11 +35,7 @@ int main() {
         level.syncWithBackground(background);
         level.playerGroundCollision(player, background);
 
-        window.clear();
-        background.draw(window);
-        level.draw(window);
-        player.draw(window);
-        window.display();
+        draw(window, background, level, player);
     }
     return 0;
 }
