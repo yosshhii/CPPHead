@@ -16,7 +16,7 @@ private:
 public:
     Background();
 
-    void update(const sf::Vector2f& movement, float dt, const sf::RenderWindow& window);
+    void update(const sf::Vector2f& movement, float dt, const sf::RenderWindow& window, int state);
     void draw(sf::RenderWindow& window);
 
     const sf::Sprite& getSprite1() const;

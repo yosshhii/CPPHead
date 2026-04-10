@@ -11,18 +11,24 @@
 int main() {
     sf::RenderWindow window = createWindow();
 
+    Background background;
+    Level level;
+    Menu menu;
+    Player player;
+
     int state = 0;
 
     if (state == 0) {
-        Background background;
-        Level level;
-        Menu menu;
+        sf::Clock clock;
+
         bool isRunning = true;
         while (isRunning) {
+            float dt = clock.restart().asSeconds();
             handleWindowEvents(window, isRunning);
             drawMenu(window, background, level, menu);
 
             menu.handleInput(window);
+            background.update({1,0}, dt, window, state);
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)) {
                 int selectedIndex = menu.getSelectedIndex();
@@ -37,10 +43,6 @@ int main() {
     }
 
     if (state == 1) {
-        Player player;
-        Background background;
-        Level level;
-
         sf::Clock clock;
 
         bool isRunning = true;
@@ -52,7 +54,7 @@ int main() {
             player.handleInput(window);
             sf::Vector2f movement = player.getMovement();
 
-            background.update(movement, dt, window);
+            background.update(movement, dt, window, state);
             player.update(dt);
 
             level.syncWithBackground(background);

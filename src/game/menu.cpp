@@ -13,7 +13,7 @@ Menu::Menu() {
 
     for (int i = 0; i < 3; i++) {
         buttons[i].setScale({scale, scale});
-        buttons[i].setPosition({-50.f, static_cast<float>(i * 100)});
+        buttons[i].setPosition({-80.f, static_cast<float>(i * 70)});
     }
 
     buttons[0].setColor(sf::Color::Green);

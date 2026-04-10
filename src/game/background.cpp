@@ -15,11 +15,18 @@ Background::Background():
     sprite2.setPosition({-width, -height / 2.f - 100.f});
 }
 
-void Background::update(const sf::Vector2f& movement, float dt, const sf::RenderWindow& window) {
-    float speed = 200.f;
+void Background::update(const sf::Vector2f& movement, float dt, const sf::RenderWindow& window, int state) {
 
-    sprite1.setPosition(sprite1.getPosition() - movement * speed * dt);
-    sprite2.setPosition(sprite2.getPosition() - movement * speed * dt);
+    if (state == 1) {
+        float speed = 200.f;
+        sprite1.setPosition(sprite1.getPosition() - movement * speed * dt);
+        sprite2.setPosition(sprite2.getPosition() - movement * speed * dt);
+    } else if (state == 0) {
+        float speed = 50.f;
+        sprite1.setPosition(sprite1.getPosition() - movement * speed * dt);
+        sprite2.setPosition(sprite2.getPosition() - movement * speed * dt);
+    }
+
 
     float rightLimit = window.getSize().x / 2.f;
     float leftLimit = -1060.f;
