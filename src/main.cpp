@@ -6,32 +6,60 @@
 #include "game/player.hpp"
 #include "game/background.hpp"
 #include "game/level.hpp"
+#include "game/menu.hpp"
 
 int main() {
     sf::RenderWindow window = createWindow();
 
-    Player player;
-    Background background;
-    Level level;
+    int state = 0;
 
-    sf::Clock clock;
+    if (state == 0) {
+        Background background;
+        Level level;
+        Menu menu;
+        bool isRunning = true;
+        while (isRunning) {
+            handleWindowEvents(window, isRunning);
+            drawMenu(window, background, level, menu);
 
-    bool isRunning = true;
-    while (isRunning) {
-        float dt = clock.restart().asSeconds();
+            menu.handleInput(window);
 
-        handleWindowEvents(window, isRunning);
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)) {
+                int selectedIndex = menu.getSelectedIndex();
 
-        player.handleInput(window);
-        sf::Vector2f movement = player.getMovement();
+                if (selectedIndex == 0) {
+                    state = 1;
+                    isRunning = false;
+                };
+                if (selectedIndex == 2) isRunning = false;
+            }
+        }
+    }
 
-        background.update(movement, dt, window);
-        player.update(dt);
+    if (state == 1) {
+        Player player;
+        Background background;
+        Level level;
 
-        level.syncWithBackground(background);
-        level.playerGroundCollision(player, background);
+        sf::Clock clock;
 
-        draw(window, background, level, player);
+        bool isRunning = true;
+        while (isRunning) {
+            float dt = clock.restart().asSeconds();
+
+            handleWindowEvents(window, isRunning);
+
+            player.handleInput(window);
+            sf::Vector2f movement = player.getMovement();
+
+            background.update(movement, dt, window);
+            player.update(dt);
+
+            level.syncWithBackground(background);
+            level.playerGroundCollision(player, background);
+
+            drawGame(window, background, level, player);
+        }
     }
     return 0;
 }

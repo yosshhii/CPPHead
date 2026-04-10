@@ -13,10 +13,10 @@ Player::Player()
 void Player::handleInput(const sf::RenderWindow& window) {
     movement = {0.f, 0.f};
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::D) ) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::D) or (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Right) )) {
         movement.x += 1;
         sprite.setScale({3.f,2.f});}
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::A)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::A) or (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Left) )) {
         movement.x -= 1;
         sprite.setScale({-3.f, 2.f});}
 

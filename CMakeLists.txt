@@ -17,7 +17,9 @@ add_executable(CPPHead src/main.cpp
 		src/game/level.hpp
 		src/game/level.cpp
 		src/engine/draw.cpp
-		src/engine/draw.hpp)
+		src/engine/draw.hpp
+		src/game/menu.hpp
+		src/game/menu.cpp)
 
 find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System)
 target_link_libraries(CPPHead PRIVATE SFML::Graphics SFML::Window SFML::System)

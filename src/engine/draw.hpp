@@ -5,5 +5,7 @@
 class Player;
 class Background;
 class Level;
+class Menu;
 
-void draw(sf::RenderWindow& window, Background& background, Level& level, Player& player);
+void drawGame(sf::RenderWindow& window, Background& background, Level& level, Player& player);
+void drawMenu(sf::RenderWindow& window, Background& background, Level& level, Menu& menu);
