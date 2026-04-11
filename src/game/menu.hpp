@@ -1,11 +1,15 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 
 class Menu {
 private:
     std::vector<sf::Sprite> buttons;
     std::vector<sf::Texture> textures;
+
+    sf::SoundBuffer buttonSwitchBuffer;
+    sf::Sound buttonSwitch;
 
     float scale = 2.5f;
 

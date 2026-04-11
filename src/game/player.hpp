@@ -1,11 +1,18 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 class Player {
 private:
     sf::Texture walkTexture;
     sf::Texture jumpTexture;
     sf::Sprite sprite;
+
+    sf::SoundBuffer jumpBuffer;
+    sf::SoundBuffer walk1Buffer, walk2Buffer;
+    sf::Sound jumpSound;
+    sf::Sound walk1Sound, walk2Sound;
+
 
     int frameWidth = 32;
     int frameHeight = 32;

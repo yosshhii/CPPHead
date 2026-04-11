@@ -3,11 +3,22 @@
 Player::Player()
         : walkTexture("assets/textures/Owlet_Monster_Walk_6.png"),
         jumpTexture("assets/textures/Owlet_Monster_Jump_8.png"),
-        sprite(walkTexture)
+        sprite(walkTexture),
+        walk1Buffer("assets/sounds/walk1.wav"),
+        walk2Buffer("assets/sounds/walk2.wav"),
+        jumpBuffer("assets/sounds/jump.wav"),
+        walk1Sound(walk1Buffer),
+        walk2Sound(walk2Buffer),
+        jumpSound(jumpBuffer)
 {
     sprite.setScale({3.f, 2.f});
     sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight)});
     sprite.setPosition({0.f, 200.f});
+
+    walk1Sound.setVolume(50.f);
+    walk2Sound.setVolume(50.f);
+
+    jumpSound.setVolume(50.f);
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {
@@ -18,7 +29,20 @@ void Player::handleInput(const sf::RenderWindow& window) {
         sprite.setScale({3.f,2.f});}
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::A) or (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Left) )) {
         movement.x -= 1;
-        sprite.setScale({-3.f, 2.f});}
+        sprite.setScale({-3.f,2.f});}
+
+    bool isMoving = (movement.x != 0.f);
+
+    if (isMoving && isOnGround) {
+        if ((walk1Sound.getStatus() != sf::SoundSource::Status::Playing) && (walk2Sound.getStatus() != sf::SoundSource::Status::Playing)) {
+            int random = rand() % 2;
+            if (random == 0) walk1Sound.play();
+            if (random == 1) walk2Sound.play();
+        }
+    } else {
+        walk1Sound.stop();
+        walk2Sound.stop();
+    }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Space) && isOnGround) {
         velocity.y = jumpForce;
@@ -27,6 +51,9 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
         currentFrame = 0;
         animationTimer = 0.f;
+
+        walk1Sound.stop();
+        jumpSound.play();
     }
 }
 

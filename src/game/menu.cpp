@@ -1,6 +1,9 @@
 #include "menu.hpp"
 
-Menu::Menu() {
+Menu::Menu():
+    buttonSwitchBuffer("assets/sounds/buttonSwitch.wav"),
+    buttonSwitch(buttonSwitchBuffer)
+{
     textures.resize(3);
 
     (void)textures[0].loadFromFile("assets/textures/StartButton/Start1.png");
@@ -17,6 +20,8 @@ Menu::Menu() {
     }
 
     buttons[0].setColor(sf::Color::Green);
+
+    buttonSwitch.setVolume(50.f);
 }
 
 void Menu::draw(sf::RenderWindow& window) {
@@ -35,10 +40,12 @@ void Menu::handleInput(const sf::RenderWindow &window) {
 
     if (downPressed && !wasDownPressed) {
         selectedIndex = (selectedIndex + 1) % static_cast<int>(buttons.size());
+        buttonSwitch.play();
     }
 
     if (upPressed && !wasUpPressed) {
         selectedIndex--;
+        buttonSwitch.play();
         if (selectedIndex < 0) selectedIndex = static_cast<int>(buttons.size()) - 1;
     }
 
