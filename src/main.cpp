@@ -16,41 +16,30 @@ int main() {
     Menu menu;
     Player player;
 
+    sf::Clock clock;
+
     int state = 0;
 
-    if (state == 0) {
-        sf::Clock clock;
+    bool isRunning = true;
+    while (isRunning) {
+        float dt = clock.restart().asSeconds();
+        handleWindowEvents(window, isRunning);
 
-        bool isRunning = true;
-        while (isRunning) {
-            float dt = clock.restart().asSeconds();
-            handleWindowEvents(window, isRunning);
-            drawMenu(window, background, level, menu);
+        if (state == 0) {
+            bool enterPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter);
 
             menu.handleInput(window);
             background.update({1,0}, dt, window, state);
+            drawMenu(window, background, level, menu);
 
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)) {
+            if (enterPressed) {
                 int selectedIndex = menu.getSelectedIndex();
 
-                if (selectedIndex == 0) {
-                    state = 1;
-                    isRunning = false;
-                };
+                if (selectedIndex == 0) state = 1;
                 if (selectedIndex == 2) isRunning = false;
             }
         }
-    }
-
-    if (state == 1) {
-        sf::Clock clock;
-
-        bool isRunning = true;
-        while (isRunning) {
-            float dt = clock.restart().asSeconds();
-
-            handleWindowEvents(window, isRunning);
-
+        else if (state == 1) {
             player.handleInput(window);
             sf::Vector2f movement = player.getMovement();
 
