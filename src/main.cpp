@@ -33,6 +33,8 @@ int main() {
             drawMenu(window, background, level, menu);
 
             if (enterPressed) {
+                menu.ButtonPicker();
+
                 int selectedIndex = menu.getSelectedIndex();
 
                 if (selectedIndex == 0) state = 1;

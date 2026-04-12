@@ -2,7 +2,9 @@
 
 Menu::Menu():
     buttonSwitchBuffer("assets/sounds/buttonSwitch.wav"),
-    buttonSwitch(buttonSwitchBuffer)
+    buttonSwitch(buttonSwitchBuffer),
+    buttonPickBuffer("assets/sounds/buttonClick.wav"),
+    buttonPick(buttonPickBuffer)
 {
     textures.resize(3);
 
@@ -22,6 +24,7 @@ Menu::Menu():
     buttons[0].setColor(sf::Color::Green);
 
     buttonSwitch.setVolume(50.f);
+    buttonPick.setVolume(25.f);
 }
 
 void Menu::draw(sf::RenderWindow& window) {
@@ -59,4 +62,8 @@ void Menu::handleInput(const sf::RenderWindow &window) {
 
     wasUpPressed = upPressed;
     wasDownPressed = downPressed;
+}
+
+void Menu::ButtonPicker() {
+    buttonPick.play();
 }

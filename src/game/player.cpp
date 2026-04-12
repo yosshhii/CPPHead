@@ -18,7 +18,7 @@ Player::Player()
     walk1Sound.setVolume(50.f);
     walk2Sound.setVolume(50.f);
 
-    jumpSound.setVolume(50.f);
+    jumpSound.setVolume(15.f);
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {

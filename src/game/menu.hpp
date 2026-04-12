@@ -9,7 +9,9 @@ private:
     std::vector<sf::Texture> textures;
 
     sf::SoundBuffer buttonSwitchBuffer;
+    sf::SoundBuffer buttonPickBuffer;
     sf::Sound buttonSwitch;
+    sf::Sound buttonPick;
 
     float scale = 2.5f;
 
@@ -23,5 +25,5 @@ public:
     void handleInput(const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
     int getSelectedIndex();
-
+    void ButtonPicker();
 };
