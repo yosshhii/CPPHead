@@ -33,7 +33,7 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
     bool isMoving = (movement.x != 0.f);
 
-    if (isMoving && isOnGround) {
+    if (isMoving & !isJumping) {
         if ((walk1Sound.getStatus() != sf::SoundSource::Status::Playing) && (walk2Sound.getStatus() != sf::SoundSource::Status::Playing)) {
             int random = rand() % 2;
             if (random == 0) walk1Sound.play();
