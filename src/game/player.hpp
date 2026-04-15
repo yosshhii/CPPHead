@@ -2,6 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
+#include "health.hpp"
+
 class Player {
 private:
     sf::Texture walkTexture;
@@ -34,6 +36,13 @@ private:
     bool isOnGround = true;
     bool isJumping = false;
 
+    HealthComponent health;
+    sf::Texture healthTexture;
+    sf::Sprite healthSprite;
+
+    int healthBarWidth = 384;
+    int healthBarHeight = 128;
+
 public:
     Player();
 
@@ -52,4 +61,7 @@ public:
     void setVelocityY(float value);
     void setOnGround(bool value);
     void setJumping(bool value);
+
+    void applyDamage(int amount);
+    const HealthComponent& getHealth() const;
 };
