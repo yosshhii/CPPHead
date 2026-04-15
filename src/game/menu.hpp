@@ -8,6 +8,9 @@ private:
     std::vector<sf::Sprite> buttons;
     std::vector<sf::Texture> textures;
 
+    sf::Texture menuTexture;
+    sf::Sprite menuSprite;
+
     sf::SoundBuffer buttonSwitchBuffer;
     sf::SoundBuffer buttonPickBuffer;
     sf::Sound buttonSwitch;

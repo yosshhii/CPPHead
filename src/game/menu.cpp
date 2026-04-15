@@ -4,8 +4,15 @@ Menu::Menu():
     buttonSwitchBuffer("assets/sounds/buttonSwitch.wav"),
     buttonSwitch(buttonSwitchBuffer),
     buttonPickBuffer("assets/sounds/buttonClick.wav"),
-    buttonPick(buttonPickBuffer)
+    buttonPick(buttonPickBuffer),
+    menuTexture("assets/textures/menu.png"),
+    menuSprite(menuTexture)
 {
+    int menuWidth = menuTexture.getSize().x;
+    int menuHeight = menuTexture.getSize().y;
+
+    int menuHalfWidth = menuWidth / 2;
+
     textures.resize(3);
 
     (void)textures[0].loadFromFile("assets/textures/StartButton/Start1.png");
@@ -23,11 +30,16 @@ Menu::Menu():
 
     buttons[0].setColor(sf::Color::Green);
 
+    menuSprite.setTextureRect(sf::IntRect({menuHalfWidth,0}, {menuHalfWidth, menuHeight}));
+    menuSprite.setScale({scale,scale});
+    menuSprite.setPosition({-160.f, -100});
+
     buttonSwitch.setVolume(50.f);
     buttonPick.setVolume(25.f);
 }
 
 void Menu::draw(sf::RenderWindow& window) {
+    window.draw(menuSprite);
     for (auto& button : buttons) {
         window.draw(button);
     }
