@@ -26,20 +26,20 @@ int main() {
         handleWindowEvents(window, isRunning);
 
         if (state == 0) {
-            bool enterPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter);
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)) {
+                menu.ButtonPicker();
+                int selectedIndex = menu.getSelectedIndex();
+
+                if (selectedIndex == 0) {
+                    level.init();
+                    state = 1;
+                }
+                if (selectedIndex == 2) isRunning = false;
+            }
 
             menu.handleInput(window);
             background.update({1,0}, dt, window, state);
             drawMenu(window, background, level, menu);
-
-            if (enterPressed) {
-                menu.ButtonPicker();
-
-                int selectedIndex = menu.getSelectedIndex();
-
-                if (selectedIndex == 0) state = 1;
-                if (selectedIndex == 2) isRunning = false;
-            }
         }
         else if (state == 1) {
             player.handleInput(window);
@@ -48,9 +48,9 @@ int main() {
             background.update(movement, dt, window, state);
             player.update(dt);
 
-            float dt = clock.restart().asSeconds();
             float windowWidth = (float)window.getSize().x;
-            level.playerGroundCollision(player, dt, windowWidth);
+
+            level.playerGroundCollision(player, dt, windowWidth, movement.x);
 
             drawGame(window, background, level, player);
         }

@@ -13,11 +13,8 @@ struct Block {
     std::string type;
 
     Block(const sf::Texture& tex, const sf::Image& m, float x, std::string t)
-        : visual(tex),
-          mask(m),
-          posX(x),
-          type(t)
-    {
+        : visual(tex), mask(m), posX(x), type(t) {
+        visual.setScale({1.0f, 1.0f});
         visual.setPosition({posX, 0.f});
     }
 
@@ -31,7 +28,6 @@ private:
     std::map<std::string, sf::Texture> textures;
     std::map<std::string, sf::Image> masks;
     float currentX = 0;
-    float scrollSpeed = 300.0f;
     std::mt19937 rng{std::random_device{}()};
 
     std::map<std::string, std::vector<std::string>> rules = {
@@ -50,6 +46,9 @@ private:
 
 public:
     void init() {
+        activeBlocks.clear();
+        currentX = 0;
+
         std::vector<std::string> types = {"Sum_bottom", "Sum_up", "Sum_top", "Sum_down", "Sum_island"};
         for (const auto& t : types) {
             textures[t].loadFromFile("assets/textures/floors/" + t + ".png");
@@ -72,10 +71,10 @@ public:
             b.visual.setPosition({b.posX, 0.f});
         }
 
-        while (!activeBlocks.empty() && (activeBlocks.front().posX + (float)activeBlocks.front().mask.getSize().x) < 0) {
+        while (!activeBlocks.empty() && (activeBlocks.front().posX + 100.f) < 0) {
             activeBlocks.pop_front();
         }
-        while (currentX < windowWidth + 1000.f) {
+        while (currentX < windowWidth + 200.f) {
             std::string lastType = activeBlocks.empty() ? "Sum_bottom" : activeBlocks.back().type;
             spawnBlock(getNextType(lastType));
         }
@@ -83,13 +82,19 @@ public:
 
     bool checkCollision(sf::Vector2f pos) {
         for (const auto& b : activeBlocks) {
-            float localX = pos.x - b.posX;
-            if (localX >= 0 && localX < (float)b.mask.getSize().x && pos.y >= 0 && pos.y < (float)b.mask.getSize().y) {
-                return b.mask.getPixel({(unsigned int)localX, (unsigned int)pos.y}) == sf::Color::Black;
+            if (pos.x >= b.posX && pos.x < b.posX + 100.f) {
+                float localX = pos.x - b.posX;
+                float localY = pos.y;
+
+                if (localY >= 0 && localY < 384.f) {
+                    sf::Color color = b.mask.getPixel({(unsigned int)localX, (unsigned int)localY});
+                    if (color.r < 50 && color.a > 200) return true;
+                }
             }
         }
         return false;
     }
+
 
     void draw(sf::RenderWindow& window) {
         for (const auto& b : activeBlocks) {
