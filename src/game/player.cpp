@@ -18,8 +18,8 @@ Player::Player()
     sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight)});
     sprite.setPosition({0.f, 200.f});
 
-    walk1Sound.setVolume(50.f);
-    walk2Sound.setVolume(50.f);
+    walk1Sound.setVolume(75.f);
+    walk2Sound.setVolume(75.f);
 
     jumpSound.setVolume(15.f);
 

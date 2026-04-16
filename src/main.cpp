@@ -48,8 +48,9 @@ int main() {
             background.update(movement, dt, window, state);
             player.update(dt);
 
-            level.syncWithBackground(background);
-            level.playerGroundCollision(player, background);
+            float dt = clock.restart().asSeconds();
+            float windowWidth = (float)window.getSize().x;
+            level.playerGroundCollision(player, dt, windowWidth);
 
             drawGame(window, background, level, player);
         }
