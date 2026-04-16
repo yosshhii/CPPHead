@@ -9,7 +9,10 @@ Player::Player()
         jumpBuffer("assets/sounds/jump.wav"),
         walk1Sound(walk1Buffer),
         walk2Sound(walk2Buffer),
-        jumpSound(jumpBuffer)
+        jumpSound(jumpBuffer),
+        health(100, 1),
+        healthTexture("assets/textures/Health/Health_Bar_Horiz.png"),
+        healthSprite(healthTexture)
 {
     sprite.setScale({3.f, 2.f});
     sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight)});
@@ -19,6 +22,10 @@ Player::Player()
     walk2Sound.setVolume(50.f);
 
     jumpSound.setVolume(15.f);
+
+    healthSprite.setTextureRect(sf::IntRect({0, 0}, {healthBarWidth, healthBarHeight}));
+    healthSprite.setScale({0.6f, 0.6f});
+    healthSprite.setPosition({-530.f, 270.f});
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {
@@ -54,6 +61,13 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
         walk1Sound.stop();
         jumpSound.play();
+    }
+
+
+    // тест получения урона
+    // потом удалить нужно будет
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::T)) {
+        applyDamage(10);
     }
 }
 
@@ -98,10 +112,27 @@ void Player::update(float dt) {
         sprite.setTextureRect(sf::IntRect({5 * frameWidth, 0}, {frameWidth, frameHeight}));
     }
 
+    health.update(dt);
+
+    if (health.isDead()) {
+        // тут должна быть логика при смерти
+        return;
+    }
+
+    int currentHp = health.getHealth();
+
+    if (currentHp > 70) {
+        healthSprite.setTextureRect(sf::IntRect({0, 0}, {healthBarWidth, healthBarHeight}));
+    } else if (currentHp > 30) {
+        healthSprite.setTextureRect(sf::IntRect({0, healthBarHeight}, {healthBarWidth, healthBarHeight}));
+    } else {
+        healthSprite.setTextureRect(sf::IntRect({0, healthBarHeight * 2}, {healthBarWidth, healthBarHeight}));
+    }
 }
 
 void Player::draw(sf::RenderWindow& window) {
     window.draw(sprite);
+    window.draw(healthSprite);
 }
 
 sf::Vector2f Player::getVelocity() const {
@@ -138,6 +169,14 @@ void Player::setOnGround(bool value) {
 
 void Player::setJumping(bool value) {
     isJumping = value;
+}
+
+void Player::applyDamage(int amount) {
+    health.takeDamage(amount);
+}
+
+const HealthComponent& Player::getHealth() const {
+    return health;
 }
 
 
