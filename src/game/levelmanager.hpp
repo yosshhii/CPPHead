@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <random>
+#include <iostream>
 
 struct Block {
     sf::Sprite visual;
@@ -28,14 +29,23 @@ private:
     std::map<std::string, sf::Texture> textures;
     std::map<std::string, sf::Image> masks;
     float currentX = 0;
+    float leftX = 0;
     std::mt19937 rng{std::random_device{}()};
 
     std::map<std::string, std::vector<std::string>> rules = {
-        {"Sum_bottom", {"Sum_up"}},
-        {"Sum_up",     {"Sum_top"}},
-        {"Sum_top",    {"Sum_down"}},
-        {"Sum_down",   {"Sum_island", "Sum_bottom"}},
-        {"Sum_island", {"Sum_up", "Sum_island"}}
+        {"bottom", {"up", "island", "bottom"}},
+        {"up",     {"top"}},
+        {"top",    {"down", "top"}},
+        {"down",   {"island", "bottom"}},
+        {"island", {"up", "island", "bottom"}}
+    };
+
+    std::map<std::string, std::vector<std::string>> reverseRules = {
+        {"up",     {"bottom", "island"}},
+        {"top",    {"up", "top"}},
+        {"down",   {"top"}},
+        {"island", {"down", "island", "bottom"}},
+        {"bottom", {"down", "bottom", "island"}}
     };
 
     std::string getNextType(std::string last) {
@@ -44,39 +54,78 @@ private:
         return candidates[dist(rng)];
     }
 
+    std::string getPreviousType(std::string first) {
+        if (reverseRules.find(first) == reverseRules.end()) return "bottom";
+        const auto& candidates = reverseRules[first];
+        std::uniform_int_distribution<std::size_t> dist(0, candidates.size() - 1);
+        return candidates[dist(rng)];
+    }
+
 public:
     void init() {
         activeBlocks.clear();
         currentX = 0;
+        leftX = 0;
 
-        std::vector<std::string> types = {"Sum_bottom", "Sum_up", "Sum_top", "Sum_down", "Sum_island"};
+        std::vector<std::string> types = {"bottom", "up", "top", "down", "island"};
         for (const auto& t : types) {
-            textures[t].loadFromFile("assets/textures/floors/" + t + ".png");
-            masks[t].loadFromFile("assets/textures/floors/" + t + "_mask.png");
+            std::string texPath = "assets/textures/floors/Sum_" + t + ".png";
+            if (!textures[t].loadFromFile(texPath)) {
+                std::cerr << "ERROR: Failed to load texture: " << texPath << std::endl;
+            }
+            std::string maskPath = "assets/textures/floors/" + t + "_mask.png";
+            if (!masks[t].loadFromFile(maskPath)) {
+                std::cerr << "ERROR: Failed to load mask: " << maskPath << std::endl;
+            }
         }
-        spawnBlock("Sum_bottom");
+        spawnBlock("bottom");
     }
 
     void spawnBlock(std::string type) {
+        float width = (float)textures[type].getSize().x;
+        if (width <= 0) {
+            width = 100.f;
+        }
         activeBlocks.emplace_back(textures[type], masks[type], currentX, type);
-        currentX += (float)textures[type].getSize().x;
+        currentX += width;
     }
+
+    void spawnBlockLeft(std::string type) {
+        float width = (float)textures[type].getSize().x;
+        if (width <= 0) {
+            width = 100.f;
+        }
+        leftX -= width;
+        activeBlocks.emplace_front(textures[type], masks[type], leftX, type);
+    }
+
 
     void update(float dt, float windowWidth, float speed) {
         float offset = speed * dt;
         currentX -= offset;
+        leftX -= offset;
 
         for (auto& b : activeBlocks) {
             b.posX -= offset;
             b.visual.setPosition({b.posX, 0.f});
         }
 
-        while (!activeBlocks.empty() && (activeBlocks.front().posX + 100.f) < 0) {
+        while (!activeBlocks.empty() && activeBlocks.back().posX > 800.f) {
+            currentX -= (float)activeBlocks.back().mask.getSize().x;
+            activeBlocks.pop_back();
+        }
+        while (currentX < 600.f) {
+            std::string lastType = activeBlocks.empty() ? "bottom" : activeBlocks.back().type;
+            spawnBlock(getNextType(lastType));
+        }
+
+        while (!activeBlocks.empty() && activeBlocks.front().posX < -800.f) {
+            leftX += (float)activeBlocks.front().mask.getSize().x;
             activeBlocks.pop_front();
         }
-        while (currentX < windowWidth + 200.f) {
-            std::string lastType = activeBlocks.empty() ? "Sum_bottom" : activeBlocks.back().type;
-            spawnBlock(getNextType(lastType));
+        while (leftX > -600.f) {
+            std::string firstType = activeBlocks.empty() ? "bottom" : activeBlocks.front().type;
+            spawnBlockLeft(getPreviousType(firstType));
         }
     }
 
@@ -98,6 +147,8 @@ public:
 
     void draw(sf::RenderWindow& window) {
         for (const auto& b : activeBlocks) {
+            std::cout << "Active blocks: " << activeBlocks.size() << std::endl;
+
             window.draw(b.visual);
         }
     }
