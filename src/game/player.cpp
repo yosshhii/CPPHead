@@ -1,8 +1,9 @@
 #include "player.hpp"
 
 Player::Player()
-        : walkTexture("assets/textures/Owlet_Monster_Walk_6.png"),
-        jumpTexture("assets/textures/Owlet_Monster_Jump_8.png"),
+        : walkTexture("assets/textures/Owlet_Monster_Walk.png"),
+        jumpTexture("assets/textures/Owlet_Monster_Jump.png"),
+        attackTexture("assets/textures/Owlet_Monster_Attack.png"),
         sprite(walkTexture),
         walk1Buffer("assets/sounds/walk1.wav"),
         walk2Buffer("assets/sounds/walk2.wav"),
@@ -40,7 +41,7 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
     bool isMoving = (movement.x != 0.f);
 
-    if (isMoving & !isJumping) {
+    if (isMoving && !isJumping) {
         if ((walk1Sound.getStatus() != sf::SoundSource::Status::Playing) && (walk2Sound.getStatus() != sf::SoundSource::Status::Playing)) {
             int random = rand() % 2;
             if (random == 0) walk1Sound.play();
@@ -69,6 +70,15 @@ void Player::handleInput(const sf::RenderWindow& window) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::T)) {
         applyDamage(10);
     }
+
+    bool attackPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::H);
+
+    if (attackPressed && !wasAttackPressed && !isAttacking) {
+        isAttacking = true;
+        currentFrame = 0;
+    }
+
+    wasAttackPressed = attackPressed;
 }
 
 void Player::update(float dt) {
@@ -80,11 +90,31 @@ void Player::update(float dt) {
     sprite.move({0.f, velocity.y * dt});
     bool isMoving = (movement.x != 0);
 
-    if (isJumping) {
+    if (isAttacking) {
+        sprite.setTexture(attackTexture);
+
+        animationTimer += dt;
+
+        if (animationTimer >= attackDuration) {
+            animationTimer = 0.f;
+            if (currentFrame < 3) {
+                currentFrame++;
+            } else {
+                isAttacking = false;
+                currentFrame = 0;
+            }
+        }
+
+        sprite.setTextureRect(sf::IntRect(
+            {currentFrame * frameWidth, 0},
+            {frameWidth, frameHeight}
+        ));
+
+    } else if (isJumping) {
         sprite.setTexture(jumpTexture);
 
         animationTimer += dt;
-        if (animationTimer >= 0.18f) {
+        if (animationTimer >= jumpDuration) {
             animationTimer = 0.f;
             if (currentFrame < 7) {
                 currentFrame++;

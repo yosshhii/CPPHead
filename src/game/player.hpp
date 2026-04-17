@@ -8,6 +8,7 @@ class Player {
 private:
     sf::Texture walkTexture;
     sf::Texture jumpTexture;
+    sf::Texture attackTexture;
     sf::Sprite sprite;
 
     sf::SoundBuffer jumpBuffer;
@@ -22,6 +23,8 @@ private:
     int currentFrame = 0;
     float animationTimer = 0.f;
     float animationSpeed = 0.12f;
+    float attackDuration = 0.1f;
+    float jumpDuration = 0.18f;
 
     //float x, y;
     //float width, height;
@@ -35,6 +38,9 @@ private:
 
     bool isOnGround = true;
     bool isJumping = false;
+    bool isAttacking = false;
+
+    bool wasAttackPressed = false;
 
     HealthComponent health;
     sf::Texture healthTexture;
