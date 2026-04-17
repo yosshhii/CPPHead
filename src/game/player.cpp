@@ -163,20 +163,23 @@ void Player::update(float dt) {
 
             DustParticle particle{sf::Sprite(dustTexture), 0.4f};
 
-            particle.sprite.setPosition({
-                sprite.getPosition().x,
-                sprite.getPosition().y - 60.f
-            });
-
             particle.sprite.setTextureRect(sf::IntRect(
                 {0, 0},
                 {frameWidth, frameHeight}
             ));
 
-            if (movement.x < 0) {
+            if (movement.x > 0) {
                 particle.sprite.setScale({dustScale,dustScale});
+                particle.sprite.setPosition({
+                sprite.getPosition().x - 40.f,
+                sprite.getPosition().y - 60.f
+            });
             } else {
                 particle.sprite.setScale({-dustScale,dustScale});
+                particle.sprite.setPosition({
+                sprite.getPosition().x + 40.f,
+                sprite.getPosition().y - 60.f
+            });
             }
             particle.lifetime = 0.4f;
 
@@ -220,7 +223,7 @@ void Player::update(float dt) {
         255, 255, 255,
         static_cast<std::uint8_t>(alpha)
         ));
-        
+
         particle.sprite.move({-movement.x * 200 * dt, -20.f * dt});
     }
 
