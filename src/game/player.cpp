@@ -122,10 +122,24 @@ void Player::update(float dt) {
         sprite.setTexture(jumpTexture);
 
         animationTimer += dt;
-        if (animationTimer >= 0.12f) {
-            animationTimer = 0.f;
-            if (jumpFrame < 7) {
-                jumpFrame++;
+        if (velocity.y < 160.f) {
+            if (animationTimer >= 0.12f) {
+                animationTimer = 0.f;
+
+                if (jumpFrame < 3) {
+                    jumpFrame++;
+                }
+            }
+        }
+        else {
+            if (animationTimer >= 0.12f) {
+                animationTimer = 0.f;
+
+                if (jumpFrame < 4) {
+                    jumpFrame = 4;
+                } else if (jumpFrame < 7) {
+                    jumpFrame++;
+                }
             }
         }
 

@@ -28,7 +28,7 @@ private:
     float jumpPeakTimer = 0.f;
     float animationSpeed = 0.12f;
     float attackDuration = 0.1f;
-    float jumpDuration = 0.08f;
+    float jumpDuration = 0.12f;
 
     //float x, y;
     //float width, height;
