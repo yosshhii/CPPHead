@@ -13,7 +13,8 @@ Player::Player()
         jumpSound(jumpBuffer),
         health(100, 1),
         healthTexture("assets/textures/Health/Health_Bar_Horiz.png"),
-        healthSprite(healthTexture)
+        healthSprite(healthTexture),
+        dustTexture("assets/textures/dust.png")
 {
     sprite.setScale({3.f, 2.f});
     sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight)});
@@ -156,10 +157,38 @@ void Player::update(float dt) {
             walkFrame = (walkFrame + 1) % 6;
         }
 
+        dustTimer += dt;
+        if (dustTimer >= 0.08f) {
+            dustTimer = 0.f;
+
+            DustParticle particle{sf::Sprite(dustTexture), 0.4f};
+
+            particle.sprite.setPosition({
+                sprite.getPosition().x,
+                sprite.getPosition().y - 60.f
+            });
+
+            particle.sprite.setTextureRect(sf::IntRect(
+                {0, 0},
+                {frameWidth, frameHeight}
+            ));
+
+            if (movement.x < 0) {
+                particle.sprite.setScale({dustScale,dustScale});
+            } else {
+                particle.sprite.setScale({-dustScale,dustScale});
+            }
+            particle.lifetime = 0.4f;
+
+            dustParticles.push_back(particle);
+        }
+
+
         sprite.setTextureRect(sf::IntRect({walkFrame * frameWidth, 0}, {frameWidth, frameHeight}));
     } else if (isOnGround) {
         sprite.setTexture(walkTexture);
         walkFrame = 5;
+        dustTimer = 0.f;
 
         sprite.setTextureRect(sf::IntRect({5 * frameWidth, 0}, {frameWidth, frameHeight}));
     }
@@ -180,9 +209,37 @@ void Player::update(float dt) {
     } else {
         healthSprite.setTextureRect(sf::IntRect({0, healthBarHeight * 2}, {healthBarWidth, healthBarHeight}));
     }
+
+    for (auto& particle: dustParticles) {
+        particle.lifetime -= dt;
+
+        float alpha = (particle.lifetime / 0.4f) * 255.f;
+        if (alpha < 0.f) alpha = 0.f;
+
+        particle.sprite.setColor(sf::Color(
+        255, 255, 255,
+        static_cast<std::uint8_t>(alpha)
+        ));
+        
+        particle.sprite.move({-movement.x * 200 * dt, -20.f * dt});
+    }
+
+    // удаление партиклов ходьбы
+    for (size_t i = 0; i < dustParticles.size(); ) {
+        if (dustParticles[i].lifetime <= 0.f) {
+            dustParticles.erase(dustParticles.begin() + i);
+        } else {
+            i++;
+        }
+    }
+
 }
 
 void Player::draw(sf::RenderWindow& window) {
+    for (auto& particle: dustParticles) {
+        window.draw(particle.sprite);
+    }
+
     window.draw(sprite);
     window.draw(healthSprite);
 }
@@ -230,8 +287,3 @@ void Player::applyDamage(int amount) {
 const HealthComponent& Player::getHealth() const {
     return health;
 }
-
-
-
-
-
