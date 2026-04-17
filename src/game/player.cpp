@@ -123,7 +123,7 @@ void Player::update(float dt) {
 
         animationTimer += dt;
         if (velocity.y < 160.f) {
-            if (animationTimer >= 0.12f) {
+            if (animationTimer >= jumpDuration) {
                 animationTimer = 0.f;
 
                 if (jumpFrame < 3) {
@@ -132,7 +132,7 @@ void Player::update(float dt) {
             }
         }
         else {
-            if (animationTimer >= 0.12f) {
+            if (animationTimer >= jumpDuration) {
                 animationTimer = 0.f;
 
                 if (jumpFrame < 4) {

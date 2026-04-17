@@ -29,7 +29,6 @@ private:
     float animationSpeed = 0.12f;
     float attackDuration = 0.1f;
     float jumpDuration = 0.12f;
-
     //float x, y;
     //float width, height;
 
