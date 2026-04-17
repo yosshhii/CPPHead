@@ -20,11 +20,15 @@ private:
     int frameWidth = 32;
     int frameHeight = 32;
 
-    int currentFrame = 0;
+    int walkFrame = 0;
+    int jumpFrame = 0;
+    int attackFrame = 0;
+
     float animationTimer = 0.f;
+    float jumpPeakTimer = 0.f;
     float animationSpeed = 0.12f;
     float attackDuration = 0.1f;
-    float jumpDuration = 0.18f;
+    float jumpDuration = 0.08f;
 
     //float x, y;
     //float width, height;

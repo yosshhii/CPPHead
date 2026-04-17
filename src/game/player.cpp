@@ -57,7 +57,7 @@ void Player::handleInput(const sf::RenderWindow& window) {
         isOnGround = false;
         isJumping = true;
 
-        currentFrame = 0;
+        jumpFrame = 0;
         animationTimer = 0.f;
 
         walk1Sound.stop();
@@ -75,7 +75,7 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
     if (attackPressed && !wasAttackPressed && !isAttacking) {
         isAttacking = true;
-        currentFrame = 0;
+        attackFrame = 0;
     }
 
     wasAttackPressed = attackPressed;
@@ -83,11 +83,19 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
 void Player::update(float dt) {
     if (!isOnGround) {
-        velocity.y += gravity * dt;
-        if (velocity.y > maxFallSpeed)
-            velocity.y = maxFallSpeed;}
+        if (velocity.y < 0) {
+            velocity.y += gravity * dt;
+        } else {
+            velocity.y += gravity * 1.2f * dt; // вниз быстрее падает
+        }
+    }
 
     sprite.move({0.f, velocity.y * dt});
+
+    if (isOnGround) {
+        isJumping = false;
+    }
+
     bool isMoving = (movement.x != 0);
 
     if (isAttacking) {
@@ -97,16 +105,16 @@ void Player::update(float dt) {
 
         if (animationTimer >= attackDuration) {
             animationTimer = 0.f;
-            if (currentFrame < 3) {
-                currentFrame++;
+            if (attackFrame < 3) {
+                attackFrame++;
             } else {
                 isAttacking = false;
-                currentFrame = 0;
+                attackFrame = 0;
             }
         }
 
         sprite.setTextureRect(sf::IntRect(
-            {currentFrame * frameWidth, 0},
+            {attackFrame * frameWidth, 0},
             {frameWidth, frameHeight}
         ));
 
@@ -114,15 +122,15 @@ void Player::update(float dt) {
         sprite.setTexture(jumpTexture);
 
         animationTimer += dt;
-        if (animationTimer >= jumpDuration) {
+        if (animationTimer >= 0.12f) {
             animationTimer = 0.f;
-            if (currentFrame < 7) {
-                currentFrame++;
+            if (jumpFrame < 7) {
+                jumpFrame++;
             }
         }
 
         sprite.setTextureRect(sf::IntRect(
-            {currentFrame * frameWidth, 0},
+            {jumpFrame * frameWidth, 0},
             {frameWidth, frameHeight}
         ));
     } else if (isMoving && isOnGround) {
@@ -131,13 +139,13 @@ void Player::update(float dt) {
         animationTimer += dt;
         if (animationTimer >= animationSpeed) {
             animationTimer = 0.f;
-            currentFrame = (currentFrame + 1) % 6;
+            walkFrame = (walkFrame + 1) % 6;
         }
 
-        sprite.setTextureRect(sf::IntRect({currentFrame * frameWidth, 0}, {frameWidth, frameHeight}));
+        sprite.setTextureRect(sf::IntRect({walkFrame * frameWidth, 0}, {frameWidth, frameHeight}));
     } else if (isOnGround) {
         sprite.setTexture(walkTexture);
-        currentFrame = 5;
+        walkFrame = 5;
 
         sprite.setTextureRect(sf::IntRect({5 * frameWidth, 0}, {frameWidth, frameHeight}));
     }
