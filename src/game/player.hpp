@@ -4,10 +4,19 @@
 
 #include "health.hpp"
 
+struct DustParticle {
+    sf::Sprite sprite;
+    float lifetime = 0.f;
+};
+
 class Player {
 private:
+    std::vector<DustParticle> dustParticles;
+
     sf::Texture walkTexture;
     sf::Texture jumpTexture;
+    sf::Texture attackTexture;
+    sf::Texture dustTexture;
     sf::Sprite sprite;
 
     sf::SoundBuffer jumpBuffer;
@@ -19,12 +28,18 @@ private:
     int frameWidth = 32;
     int frameHeight = 32;
 
-    int currentFrame = 0;
-    float animationTimer = 0.f;
-    float animationSpeed = 0.12f;
+    int walkFrame = 0;
+    int jumpFrame = 0;
+    int attackFrame = 0;
 
-    //float x, y;
-    //float width, height;
+    float animationTimer = 0.f;
+    float jumpPeakTimer = 0.f;
+    float dustTimer = 0.f;
+    float animationSpeed = 0.12f;
+    float attackDuration = 0.1f;
+    float jumpDuration = 0.12f;
+
+    float dustScale = 2.f;
 
     sf::Vector2f velocity{0.f,0.f};
     sf::Vector2f movement{0.f,0.f};
@@ -35,6 +50,9 @@ private:
 
     bool isOnGround = true;
     bool isJumping = false;
+    bool isAttacking = false;
+
+    bool wasAttackPressed = false;
 
     HealthComponent health;
     sf::Texture healthTexture;
