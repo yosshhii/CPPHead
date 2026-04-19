@@ -200,7 +200,7 @@ void Player::update(float dt) {
 
     if (health.isDead()) {
         // тут должна быть логика при смерти
-        return;
+        ;
     }
 
     int currentHp = health.getHealth();
@@ -210,7 +210,7 @@ void Player::update(float dt) {
     } else if (currentHp > 1) {
         healthSprite.setTextureRect(sf::IntRect({0, healthBarHeight}, {healthBarWidth, healthBarHeight}));
     } else {
-        healthSprite.setTextureRect(sf::IntRect({0, healthBarHeight * 2}, {healthBarWidth, healthBarHeight}));
+        healthSprite.setTextureRect(sf::IntRect({0, healthBarHeight * 2 + 8}, {healthBarWidth, healthBarHeight}));
     }
 
     for (auto& particle: dustParticles) {
