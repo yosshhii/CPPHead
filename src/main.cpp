@@ -13,7 +13,14 @@ int main() {
 
     Background background;
     Level level;
-    Menu menu;
+    Menu mainMenu(
+            {
+                    "assets/textures/StartButton/Start1.png",
+                    "assets/textures/SettingsButton/Settings1.png",
+                    "assets/textures/QuitButton/Quit1.png"
+            },
+            "assets/textures/menu.png"
+    );
     Player player;
 
     sf::Clock clock;
@@ -28,14 +35,14 @@ int main() {
         if (state == 0) {
             bool enterPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter);
 
-            menu.handleInput(window);
+            mainMenu.handleInput(window);
             background.update({1,0}, dt, window, state);
-            drawMenu(window, background, level, menu);
+            drawMenu(window, background, level, mainMenu);
 
             if (enterPressed) {
-                menu.ButtonPicker();
+                mainMenu.ButtonPicker();
 
-                int selectedIndex = menu.getSelectedIndex();
+                int selectedIndex = mainMenu.getSelectedIndex();
 
                 if (selectedIndex == 0) state = 1;
                 if (selectedIndex == 2) isRunning = false;

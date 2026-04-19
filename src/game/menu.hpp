@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <vector>
+#include <string>
 
 class Menu {
 private:
@@ -23,7 +24,7 @@ private:
     bool wasUpPressed = false;
     bool wasDownPressed = false;
 public:
-    Menu();
+    Menu(const std::vector<std::string>& buttonPaths, const std::string& backgroundPath);
 
     void handleInput(const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);

@@ -1,38 +1,35 @@
 #include "menu.hpp"
 
-Menu::Menu():
-    buttonSwitchBuffer("assets/sounds/buttonSwitch.wav"),
-    buttonSwitch(buttonSwitchBuffer),
-    buttonPickBuffer("assets/sounds/buttonClick.wav"),
-    buttonPick(buttonPickBuffer),
-    menuTexture("assets/textures/menu.png"),
-    menuSprite(menuTexture)
+Menu::Menu(const std::vector<std::string>& buttonPaths, const std::string& backgroundPath):
+        buttonSwitchBuffer("assets/sounds/buttonSwitch.wav"),
+        buttonSwitch(buttonSwitchBuffer),
+        buttonPickBuffer("assets/sounds/buttonClick.wav"),
+        buttonPick(buttonPickBuffer),
+        menuTexture(backgroundPath),
+        menuSprite(menuTexture)
 {
     int menuWidth = menuTexture.getSize().x;
     int menuHeight = menuTexture.getSize().y;
-
     int menuHalfWidth = menuWidth / 2;
 
-    textures.resize(3);
+    menuSprite.setTextureRect(sf::IntRect({menuHalfWidth, 0}, {menuHalfWidth, menuHeight}));
+    menuSprite.setScale({scale, scale});
+    menuSprite.setPosition({-160.f, -100.f});
 
-    (void)textures[0].loadFromFile("assets/textures/StartButton/Start1.png");
-    (void)textures[1].loadFromFile("assets/textures/SettingsButton/Settings1.png");
-    (void)textures[2].loadFromFile("assets/textures/QuitButton/Quit1.png");
+    int count = buttonPaths.size();
+    textures.resize(count);
 
-    buttons.emplace_back(textures[0]);
-    buttons.emplace_back(textures[1]);
-    buttons.emplace_back(textures[2]);
+    for (int i = 0; i < count; i++) {
+        (void)textures[i].loadFromFile(buttonPaths[i]);
+        buttons.emplace_back(textures[i]);
 
-    for (int i = 0; i < 3; i++) {
         buttons[i].setScale({scale, scale});
         buttons[i].setPosition({-80.f, static_cast<float>(i * 70)});
     }
 
-    buttons[0].setColor(sf::Color::Green);
-
-    menuSprite.setTextureRect(sf::IntRect({menuHalfWidth,0}, {menuHalfWidth, menuHeight}));
-    menuSprite.setScale({scale,scale});
-    menuSprite.setPosition({-160.f, -100});
+    if (!buttons.empty()) {
+        buttons[0].setColor(sf::Color::Green);
+    }
 
     buttonSwitch.setVolume(50.f);
     buttonPick.setVolume(25.f);
