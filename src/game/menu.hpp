@@ -24,7 +24,7 @@ private:
     bool wasUpPressed = false;
     bool wasDownPressed = false;
 public:
-    Menu(const std::vector<std::string>& buttonPaths, const std::string& backgroundPath);
+    Menu(const std::vector<std::string>& buttonPaths, const std::string& backgroundPath, int bgFrameIndex = 1);
 
     void handleInput(const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);

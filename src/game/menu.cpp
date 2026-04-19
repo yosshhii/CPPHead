@@ -1,7 +1,6 @@
 #include "menu.hpp"
 
-Menu::Menu(const std::vector<std::string>& buttonPaths, const std::string& backgroundPath):
-        buttonSwitchBuffer("assets/sounds/buttonSwitch.wav"),
+Menu::Menu(const std::vector<std::string>& buttonPaths, const std::string& backgroundPath, int bgFrameIndex):        buttonSwitchBuffer("assets/sounds/buttonSwitch.wav"),
         buttonSwitch(buttonSwitchBuffer),
         buttonPickBuffer("assets/sounds/buttonClick.wav"),
         buttonPick(buttonPickBuffer),
@@ -12,7 +11,7 @@ Menu::Menu(const std::vector<std::string>& buttonPaths, const std::string& backg
     int menuHeight = menuTexture.getSize().y;
     int menuHalfWidth = menuWidth / 2;
 
-    menuSprite.setTextureRect(sf::IntRect({menuHalfWidth, 0}, {menuHalfWidth, menuHeight}));
+    menuSprite.setTextureRect(sf::IntRect({menuHalfWidth * bgFrameIndex, 0}, {menuHalfWidth, menuHeight}));
     menuSprite.setScale({scale, scale});
     menuSprite.setPosition({-160.f, -100.f});
 
@@ -24,7 +23,7 @@ Menu::Menu(const std::vector<std::string>& buttonPaths, const std::string& backg
         buttons.emplace_back(textures[i]);
 
         buttons[i].setScale({scale, scale});
-        buttons[i].setPosition({-80.f, static_cast<float>(i * 70)});
+        buttons[i].setPosition({-80.f, static_cast<float>(i * 70 + 20.f)});
     }
 
     if (!buttons.empty()) {
