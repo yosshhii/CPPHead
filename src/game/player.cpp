@@ -10,7 +10,7 @@ Player::Player()
         walk1Sound(walk1Buffer),
         walk2Sound(walk2Buffer),
         jumpSound(jumpBuffer),
-        health(100, 1),
+        health(3, 0.5f),
         healthTexture("assets/textures/Health/Health_Bar_Horiz.png"),
         healthSprite(healthTexture)
 {
@@ -67,7 +67,7 @@ void Player::handleInput(const sf::RenderWindow& window) {
     // тест получения урона
     // потом удалить нужно будет
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::T)) {
-        applyDamage(10);
+        applyDamage(1);
     }
 }
 
@@ -121,9 +121,9 @@ void Player::update(float dt) {
 
     int currentHp = health.getHealth();
 
-    if (currentHp > 70) {
+    if (currentHp > 2) {
         healthSprite.setTextureRect(sf::IntRect({0, 0}, {healthBarWidth, healthBarHeight}));
-    } else if (currentHp > 30) {
+    } else if (currentHp > 1) {
         healthSprite.setTextureRect(sf::IntRect({0, healthBarHeight}, {healthBarWidth, healthBarHeight}));
     } else {
         healthSprite.setTextureRect(sf::IntRect({0, healthBarHeight * 2}, {healthBarWidth, healthBarHeight}));
