@@ -14,7 +14,8 @@ Player::Player()
         health(3, 0.5f),
         healthTexture("assets/textures/Health/Health_Bar_Horiz.png"),
         healthSprite(healthTexture),
-        dustTexture("assets/textures/dust.png")
+        runDustTexture("assets/textures/dust.png"),
+        jumpDustTexture("assets/textures/jumpDust.png")
 {
     sprite.setScale({3.f, 2.f});
     sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight)});
@@ -26,8 +27,8 @@ Player::Player()
     jumpSound.setVolume(15.f);
 
     healthSprite.setTextureRect(sf::IntRect({0, 0}, {healthBarWidth, healthBarHeight}));
-    healthSprite.setScale({0.6f, 0.6f});
-    healthSprite.setPosition({-530.f, 270.f});
+    healthSprite.setScale({healthBarScale, healthBarScale});
+    healthSprite.setPosition({healthBarPosX, healthBarPosY});
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {
@@ -35,10 +36,10 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::D) or (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Right) )) {
         movement.x += 1;
-        sprite.setScale({3.f,2.f});}
+        sprite.setScale({playerScaleX,playerScaleY});}
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::A) or (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Left) )) {
         movement.x -= 1;
-        sprite.setScale({-3.f,2.f});}
+        sprite.setScale({-playerScaleX,playerScaleY});}
 
     bool isMoving = (movement.x != 0.f);
 
@@ -63,6 +64,29 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
         walk1Sound.stop();
         jumpSound.play();
+
+        for (int i = 0; i < 5; i++) {
+            JumpDustParticle particle{sf::Sprite(jumpDustTexture), 0.4f};
+
+            particle.sprite.setTextureRect(sf::IntRect(
+                {0, 0},
+                {frameWidth, frameHeight}
+            ));
+
+            particle.sprite.setPosition({
+                sprite.getPosition().x + (rand() % 40 - 45),
+                sprite.getPosition().y - 50.f
+            });
+
+            particle.velocity = {
+                static_cast<float>(rand() % 100 - 50),
+                static_cast<float>(-120 + rand() % 40)
+            };
+
+            particle.sprite.setScale({dustScale, dustScale});
+
+            jumpDustParticles.push_back(particle);
+        }
     }
 
 
@@ -158,10 +182,10 @@ void Player::update(float dt) {
         }
 
         dustTimer += dt;
-        if (dustTimer >= 0.08f) {
+        if (dustTimer >= dustAnimationDuration) {
             dustTimer = 0.f;
 
-            DustParticle particle{sf::Sprite(dustTexture), 0.4f};
+            DustParticle particle{sf::Sprite(runDustTexture), 0.4f};
 
             particle.sprite.setTextureRect(sf::IntRect(
                 {0, 0},
@@ -171,17 +195,17 @@ void Player::update(float dt) {
             if (movement.x > 0) {
                 particle.sprite.setScale({dustScale,dustScale});
                 particle.sprite.setPosition({
-                sprite.getPosition().x - 40.f,
-                sprite.getPosition().y - 60.f
+                sprite.getPosition().x - playerOffsetX,
+                sprite.getPosition().y - playerOffsetY
             });
             } else {
                 particle.sprite.setScale({-dustScale,dustScale});
                 particle.sprite.setPosition({
-                sprite.getPosition().x + 40.f,
-                sprite.getPosition().y - 60.f
+                sprite.getPosition().x + playerOffsetX,
+                sprite.getPosition().y - playerOffsetY
             });
             }
-            particle.lifetime = 0.4f;
+            particle.lifetime = dustLifeTime;
 
             dustParticles.push_back(particle);
         }
@@ -216,7 +240,7 @@ void Player::update(float dt) {
     for (auto& particle: dustParticles) {
         particle.lifetime -= dt;
 
-        float alpha = (particle.lifetime / 0.4f) * 255.f;
+        float alpha = (particle.lifetime / dustLifeTime) * 255.f;
         if (alpha < 0.f) alpha = 0.f;
 
         particle.sprite.setColor(sf::Color(
@@ -224,7 +248,22 @@ void Player::update(float dt) {
         static_cast<std::uint8_t>(alpha)
         ));
 
-        particle.sprite.move({-movement.x * 200 * dt, -20.f * dt});
+        particle.sprite.move({-movement.x * worldSpeed * dt, -20.f * dt});
+    }
+
+    for (auto& particle: jumpDustParticles) {
+        particle.lifetime -= dt;
+
+        float alpha = (particle.lifetime / dustLifeTime) * 255.f;
+        if (alpha < 0.f) alpha = 0.f;
+
+        particle.sprite.setColor(sf::Color(
+        255, 255, 255,
+        static_cast<std::uint8_t>(alpha)
+        ));
+
+        particle.sprite.move({-movement.x * worldSpeed * dt, -15 * dt});
+        //particle.sprite.move({particle.velocity.x * dt,particle.velocity.y * dt});
     }
 
     // удаление партиклов ходьбы
@@ -236,10 +275,23 @@ void Player::update(float dt) {
         }
     }
 
+    // удаление партиклов прыжка
+    for (size_t i = 0; i < jumpDustParticles.size(); ) {
+        if (jumpDustParticles[i].lifetime <= 0.f) {
+            jumpDustParticles.erase(jumpDustParticles.begin() + i);
+        } else {
+            i++;
+        }
+    }
+
 }
 
 void Player::draw(sf::RenderWindow& window) {
     for (auto& particle: dustParticles) {
+        window.draw(particle.sprite);
+    }
+
+    for (auto& particle: jumpDustParticles) {
         window.draw(particle.sprite);
     }
 

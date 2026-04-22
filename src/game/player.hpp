@@ -9,14 +9,22 @@ struct DustParticle {
     float lifetime = 0.f;
 };
 
+struct JumpDustParticle {
+    sf::Sprite sprite;
+    float lifetime = 0.f;
+    sf::Vector2f velocity;
+};
+
 class Player {
 private:
     std::vector<DustParticle> dustParticles;
+    std::vector<JumpDustParticle> jumpDustParticles;
 
     sf::Texture walkTexture;
     sf::Texture jumpTexture;
     sf::Texture attackTexture;
-    sf::Texture dustTexture;
+    sf::Texture runDustTexture;
+    sf::Texture jumpDustTexture;
     sf::Sprite sprite;
 
     sf::SoundBuffer jumpBuffer;
@@ -24,9 +32,14 @@ private:
     sf::Sound jumpSound;
     sf::Sound walk1Sound, walk2Sound;
 
-
     int frameWidth = 32;
     int frameHeight = 32;
+
+    float playerOffsetX = 40.f;
+    float playerOffsetY = 60.f;
+
+    float playerScaleX = 3.f;
+    float playerScaleY = 2.f;
 
     int walkFrame = 0;
     int jumpFrame = 0;
@@ -40,6 +53,8 @@ private:
     float jumpDuration = 0.12f;
 
     float dustScale = 2.f;
+    float dustLifeTime = 0.4f;
+    float dustAnimationDuration = 0.08f;
 
     sf::Vector2f velocity{0.f,0.f};
     sf::Vector2f movement{0.f,0.f};
@@ -47,6 +62,8 @@ private:
     float jumpForce = -600.f;
     float gravity = 1500.f;
     float maxFallSpeed = 800.f;
+
+    float worldSpeed = 200.f;
 
     bool isOnGround = true;
     bool isJumping = false;
@@ -60,11 +77,13 @@ private:
 
     int healthBarWidth = 384;
     int healthBarHeight = 128;
+    float healthBarPosX = -530.f;
+    float healthBarPosY = 270.f;
+    float healthBarScale = 0.6f;
 
 public:
     Player();
 
-    void init();
     void update(float deltaTime);
     void handleInput(const sf::RenderWindow& window);
     void draw(sf::RenderWindow &window);
