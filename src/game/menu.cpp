@@ -1,6 +1,11 @@
 #include "menu.hpp"
 
-Menu::Menu(const std::vector<std::string>& buttonPaths, const std::string& backgroundPath, int bgFrameIndex):        buttonSwitchBuffer("assets/sounds/buttonSwitch.wav"),
+Menu::Menu(const std::vector<std::string>& buttonPaths,
+           const std::string& backgroundPath,
+           int bgFrameIndex,
+           float startY,
+           float spacingY):
+        buttonSwitchBuffer("assets/sounds/buttonSwitch.wav"),
         buttonSwitch(buttonSwitchBuffer),
         buttonPickBuffer("assets/sounds/buttonClick.wav"),
         buttonPick(buttonPickBuffer),
@@ -23,7 +28,7 @@ Menu::Menu(const std::vector<std::string>& buttonPaths, const std::string& backg
         buttons.emplace_back(textures[i]);
 
         buttons[i].setScale({scale, scale});
-        buttons[i].setPosition({-80.f, static_cast<float>(i * 70 + 20.f)});
+        buttons[i].setPosition({-80.f, static_cast<float>(i * spacingY + startY)});
     }
 
     if (!buttons.empty()) {

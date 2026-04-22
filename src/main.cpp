@@ -30,7 +30,11 @@ int main() {
                     "assets/textures/Main Menu/Main Menu1.png"
             },
             "assets/textures/menu.png",
-            0
+            0,
+            20.f,
+            120.f,
+            "assets/textures/Volume/Swiper/Swiper1.png",
+            "assets/textures/Volume/Swiper/Swiper2.png"
     );
 
     sf::Clock clock;
