@@ -1,6 +1,5 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <deque>
 #include <vector>
 #include <string>
 #include <map>
@@ -25,11 +24,12 @@ struct Block {
 
 class LevelManager {
 private:
-    std::deque<Block> activeBlocks;
+    std::map<float, Block> worldBlocks;
     std::map<std::string, sf::Texture> textures;
     std::map<std::string, sf::Image> masks;
-    float currentX = 0;
-    float leftX = 0;
+    float worldOffset = 0; // Насколько мы сдвинулись
+    float lastGeneratedRightX = 0;
+    float lastGeneratedLeftX = 0;
     std::mt19937 rng{std::random_device{}()};
 
     std::map<std::string, std::vector<std::string>> rules = {
@@ -61,11 +61,22 @@ private:
         return candidates[dist(rng)];
     }
 
+    std::string getLastType() {
+        if (worldBlocks.empty()) return "bottom";
+        return worldBlocks.rbegin()->second.type;
+    }
+
+    std::string getFirstType() {
+        if (worldBlocks.empty()) return "bottom";
+        return worldBlocks.begin()->second.type;
+    }
+
 public:
     void init() {
-        activeBlocks.clear();
-        currentX = 0;
-        leftX = 0;
+        worldBlocks.clear();
+        worldOffset = 0;
+        lastGeneratedRightX = 0;
+        lastGeneratedLeftX = 0;
 
         std::vector<std::string> types = {"bottom", "up", "top", "down", "island"};
         for (const auto& t : types) {
@@ -78,78 +89,66 @@ public:
                 std::cerr << "ERROR: Failed to load mask: " << maskPath << std::endl;
             }
         }
-        spawnBlock("bottom");
+        spawnBlockAt(0, "bottom");
     }
 
-    void spawnBlock(std::string type) {
-        float width = (float)textures[type].getSize().x;
-        if (width <= 0) {
-            width = 100.f;
+    void spawnBlockAt(float x, std::string type) {
+        if (worldBlocks.find(x) == worldBlocks.end()) {
+            worldBlocks.emplace(std::piecewise_construct,
+                               std::forward_as_tuple(x),
+                               std::forward_as_tuple(textures[type], masks[type], x, type));
         }
-        activeBlocks.emplace_back(textures[type], masks[type], currentX, type);
-        currentX += width;
     }
-
-    void spawnBlockLeft(std::string type) {
-        float width = (float)textures[type].getSize().x;
-        if (width <= 0) {
-            width = 100.f;
-        }
-        leftX -= width;
-        activeBlocks.emplace_front(textures[type], masks[type], leftX, type);
-    }
-
 
     void update(float dt, float windowWidth, float speed) {
-        float offset = speed * dt;
-        currentX -= offset;
-        leftX -= offset;
+        worldOffset += speed * dt;
 
-        for (auto& b : activeBlocks) {
-            b.posX -= offset;
-            b.visual.setPosition({b.posX, 0.f});
-        }
+        float viewMargin = 1000.f;
 
-        while (!activeBlocks.empty() && activeBlocks.back().posX > 800.f) {
-            currentX -= (float)activeBlocks.back().mask.getSize().x;
-            activeBlocks.pop_back();
-        }
-        while (currentX < 600.f) {
-            std::string lastType = activeBlocks.empty() ? "bottom" : activeBlocks.back().type;
-            spawnBlock(getNextType(lastType));
+        while (lastGeneratedRightX < worldOffset + windowWidth + viewMargin) {
+            std::string next = getNextType(getLastType());
+            float width = (float)textures[next].getSize().x;
+            if (width <= 0) width = 150.f;
+            lastGeneratedRightX += width;
+            spawnBlockAt(lastGeneratedRightX, next);
         }
 
-        while (!activeBlocks.empty() && activeBlocks.front().posX < -800.f) {
-            leftX += (float)activeBlocks.front().mask.getSize().x;
-            activeBlocks.pop_front();
-        }
-        while (leftX > -600.f) {
-            std::string firstType = activeBlocks.empty() ? "bottom" : activeBlocks.front().type;
-            spawnBlockLeft(getPreviousType(firstType));
+        while (lastGeneratedLeftX > worldOffset - viewMargin) {
+            std::string prev = getPreviousType(getFirstType());
+            float width = (float)textures[prev].getSize().x;
+            if (width <= 0) width = 150.f;
+            lastGeneratedLeftX -= width;
+            spawnBlockAt(lastGeneratedLeftX, prev);
         }
     }
 
     bool checkCollision(sf::Vector2f pos) {
-        for (const auto& b : activeBlocks) {
-            if (pos.x >= b.posX && pos.x < b.posX + 100.f) {
-                float localX = pos.x - b.posX;
+        float worldPosX = pos.x + worldOffset;
+
+        for (const auto& [x, b] : worldBlocks) {
+            float width = 150.f;
+            if (worldPosX >= b.posX && worldPosX < b.posX + width) {
+                float localX = worldPosX - b.posX;
                 float localY = pos.y;
 
                 if (localY >= 0 && localY < 384.f) {
-                    sf::Color color = b.mask.getPixel({(unsigned int)localX, (unsigned int)localY});
-                    if (color.r < 50 && color.a > 200) return true;
+                    if ((unsigned int)localX < b.mask.getSize().x) {
+                        sf::Color color = b.mask.getPixel({(unsigned int)localX, (unsigned int)localY});
+                        if (color.r < 50 && color.a > 200) return true;
+                    }
                 }
             }
         }
         return false;
     }
 
-
     void draw(sf::RenderWindow& window) {
-        for (const auto& b : activeBlocks) {
-            std::cout << "Active blocks: " << activeBlocks.size() << std::endl;
-
-            window.draw(b.visual);
+        for (auto& [x, b] : worldBlocks) {
+            float screenX = b.posX - worldOffset;
+            if (screenX > -800.f && screenX < 700.f) {
+                b.visual.setPosition({screenX, 0.f});
+                window.draw(b.visual);
+            }
         }
     }
 };

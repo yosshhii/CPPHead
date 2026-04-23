@@ -5,9 +5,6 @@
 
 Level::Level() {}
 
-// void Level::syncWithBackground(const Background& background) {
-// }
-
 void Level::init() {
     levelManager.init();
 }
@@ -18,7 +15,7 @@ void Level::draw(sf::RenderWindow& window) {
 
 void Level::playerGroundCollision(Player& player, float dt, float windowWidth, float inputX) {
     float currentSpeed = 0.0f;
-    float movementSpeed = 400.0f;
+    float movementSpeed = 300.0f;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
         currentSpeed = movementSpeed;
