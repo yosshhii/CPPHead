@@ -74,7 +74,6 @@ int main() {
                   state = 1;
                   level.init();
                 }
-
                 if (selectedIndex == 1) state = 2;
                 if (selectedIndex == 2) isRunning = false;
             }

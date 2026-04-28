@@ -20,7 +20,6 @@ void drawMenu(sf::RenderWindow& window, Background& background, Level& level, Me
     window.clear();
 
     background.draw(window);
-    level.draw(window);
     menu.draw(window);
 
     window.display();
@@ -30,7 +29,6 @@ void drawSettings(sf::RenderWindow& window, Background& background, Level& level
     window.clear();
 
     background.draw(window);
-    level.draw(window);
     settings.draw(window);
 
     window.display();
