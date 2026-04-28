@@ -35,3 +35,26 @@ void drawSettings(sf::RenderWindow& window, Background& background, Level& level
 
     window.display();
 }
+
+void drawPauseMenu(sf::RenderWindow& window, Background& background, Level& level, Player& player, Settings& pauseMenu) {
+    window.clear();
+
+    background.draw(window);
+    level.draw(window);
+    player.draw(window);
+
+    sf::View currentView = window.getView();
+
+    sf::RectangleShape darkOverlay(currentView.getSize());
+
+    darkOverlay.setOrigin({currentView.getSize().x / 2.0f, currentView.getSize().y / 2.0f});
+
+    darkOverlay.setPosition(currentView.getCenter());
+
+    darkOverlay.setFillColor(sf::Color(0, 0, 0, 170));
+    window.draw(darkOverlay);
+
+    pauseMenu.draw(window);
+
+    window.display();
+}

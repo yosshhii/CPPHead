@@ -7,7 +7,8 @@ Settings::Settings(const std::vector<std::string>& buttonPaths,
                    float startY,
                    float spacingY,
                    const std::string& trackPath,
-                   const std::string& knobPath)
+                   const std::string& knobPath,
+                   float volumeStartY)
         : menu(buttonPaths, backgroundPath, bgFrameIndex, startY, spacingY),
           trackTexture(trackPath),
           trackSprite(trackTexture),
@@ -15,16 +16,14 @@ Settings::Settings(const std::vector<std::string>& buttonPaths,
           knobSprite(knobTexture)
 {
     float trackX = -80.f;
-    float trackY = startY + 30.f;
 
     trackSprite.setScale({trackScale, trackScale});
     knobSprite.setScale({knobScale, knobScale});
 
-    // Оставляем якорь по центру
     sf::FloatRect kBounds = knobSprite.getLocalBounds();
     knobSprite.setOrigin({kBounds.size.x / 2.0f, kBounds.size.y / 2.0f});
 
-    trackSprite.setPosition({trackX, trackY});
+    trackSprite.setPosition({trackX, volumeStartY});
 
     float tWidth = trackSprite.getGlobalBounds().size.x;
     float tHeight = trackSprite.getGlobalBounds().size.y;
@@ -37,7 +36,7 @@ Settings::Settings(const std::vector<std::string>& buttonPaths,
 
     trackTravel = knobMaxX - knobMinX;
 
-    float knobY = trackY + (tHeight / 2.0f);
+    float knobY = volumeStartY + (tHeight / 2.0f);
 
     float startKnobX = knobMinX + (trackTravel * (currentVolume / 100.f));
     knobSprite.setPosition({startKnobX, knobY});

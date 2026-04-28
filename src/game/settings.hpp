@@ -29,7 +29,8 @@ public:
              float startY,
              float spacingY,
              const std::string& trackPath,
-             const std::string& knobPath);
+             const std::string& knobPath,
+             float volumeStartY);
 
     void draw(sf::RenderWindow& window);
     void handleInput(const sf::RenderWindow& window);

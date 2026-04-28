@@ -34,13 +34,28 @@ int main() {
             20.f,
             120.f,
             "assets/textures/Volume/Swiper/Swiper1.png",
-            "assets/textures/Volume/Swiper/Swiper2.png"
+            "assets/textures/Volume/Swiper/Swiper2.png",
+            50.f
+    );
+    Settings pauseMenu(
+            {
+                    "assets/textures/Volume/Volume1.png",
+                    "assets/textures/Main Menu/Main Menu1.png"
+            },
+            "assets/textures/menu.png",
+            0,
+            20.f,
+            120.f,
+            "assets/textures/Volume/Swiper/Swiper1.png",
+            "assets/textures/Volume/Swiper/Swiper2.png",
+            50.f
     );
 
     sf::Clock clock;
 
     int state = 0;
     bool wasEnterPressed = false;
+    bool wasEscPressed = false;
 
     bool isRunning = true;
     while (isRunning) {
@@ -48,6 +63,7 @@ int main() {
         handleWindowEvents(window, isRunning);
 
         bool isEnterPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter);
+        bool isEscPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape);
 
         if (state == 0) {
             mainMenu.handleInput(window);
@@ -65,6 +81,10 @@ int main() {
             }
         }
         else if (state == 1) {
+            if (isEscPressed && !wasEscPressed) {
+                state = 3;
+            }
+
             player.handleInput(window);
             sf::Vector2f movement = player.getMovement();
 
@@ -90,7 +110,26 @@ int main() {
                 if (selectedIndex == 1) state = 0;
             }
         }
+        else if (state == 3) {
+            pauseMenu.handleInput(window);
+
+            drawPauseMenu(window, background, level, player, pauseMenu);
+
+            if (isEscPressed && !wasEscPressed) {
+                state = 1;
+            }
+
+            if (isEnterPressed && !wasEnterPressed) {
+                pauseMenu.ButtonPicker();
+                int selectedIndex = pauseMenu.getSelectedIndex();
+
+                if (selectedIndex == 0) state = 1;
+                if (selectedIndex == 1) state = 0;
+            }
+        }
+
         wasEnterPressed = isEnterPressed;
+        wasEscPressed = isEscPressed;
     }
     return 0;
 }
