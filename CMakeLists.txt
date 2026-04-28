@@ -24,6 +24,7 @@ add_executable(CPPHead src/main.cpp
         src/game/health.cpp
 		src/game/settings.hpp
 		src/game/settings.cpp)
+		src/game/levelmanager.hpp)
 
 find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System Audio)
 target_link_libraries(CPPHead PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)

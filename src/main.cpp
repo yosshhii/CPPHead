@@ -66,19 +66,22 @@ int main() {
         bool isEscPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape);
 
         if (state == 0) {
-            mainMenu.handleInput(window);
-            background.update({1,0}, dt, window, state);
-            drawMenu(window, background, level, mainMenu);
-
             if (isEnterPressed && !wasEnterPressed) {
                 mainMenu.ButtonPicker();
-
                 int selectedIndex = mainMenu.getSelectedIndex();
 
-                if (selectedIndex == 0) state = 1;
+                if (selectedIndex == 0) {
+                  state = 1;
+                  level.init();
+                }
+
                 if (selectedIndex == 1) state = 2;
                 if (selectedIndex == 2) isRunning = false;
             }
+
+            mainMenu.handleInput(window);
+            background.update({1,0}, dt, window, state);
+            drawMenu(window, background, level, mainMenu);
         }
         else if (state == 1) {
             if (isEscPressed && !wasEscPressed) {
@@ -91,8 +94,9 @@ int main() {
             background.update(movement, dt, window, state);
             player.update(dt);
 
-            level.syncWithBackground(background);
-            level.playerGroundCollision(player, background);
+            float windowWidth = (float)window.getSize().x;
+
+            level.playerGroundCollision(player, dt, windowWidth, movement.x);
 
             drawGame(window, background, level, player);
         }
