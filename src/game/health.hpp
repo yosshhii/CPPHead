@@ -13,6 +13,7 @@ public:
     void takeDamage(int amount);
     void heal(int amount);
     void update(float deltaTime);
+    void reset();
 
     int getHealth() const;
     int getMaxHealth() const;

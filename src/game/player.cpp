@@ -29,6 +29,8 @@ Player::Player()
     healthSprite.setTextureRect(sf::IntRect({0, 0}, {healthBarWidth, healthBarHeight}));
     healthSprite.setScale({healthBarScale, healthBarScale});
     healthSprite.setPosition({healthBarPosX, healthBarPosY});
+
+    sprite.setTextureRect(sf::IntRect({0, 0}, {frameWidth, frameHeight}));
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {
@@ -222,11 +224,6 @@ void Player::update(float dt) {
 
     health.update(dt);
 
-    if (health.isDead()) {
-        // тут должна быть логика при смерти
-        ;
-    }
-
     int currentHp = health.getHealth();
 
     if (currentHp > 2) {
@@ -341,4 +338,23 @@ void Player::applyDamage(int amount) {
 
 const HealthComponent& Player::getHealth() const {
     return health;
+}
+
+bool Player::isDead() const {
+    return health.isDead();
+}
+
+void Player::reset(sf::Vector2f startPosition) {
+    sprite.setPosition(startPosition);
+    velocity.y = 0.f;
+    isOnGround = false;
+    isJumping = false;
+    isAttacking = false;
+
+    sprite.setTextureRect(sf::IntRect({0, 0}, {frameWidth, frameHeight}));
+
+    health.reset();
+
+    dustParticles.clear();
+    jumpDustParticles.clear();
 }

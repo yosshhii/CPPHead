@@ -101,4 +101,6 @@ public:
 
     void applyDamage(int amount);
     const HealthComponent& getHealth() const;
+    bool isDead() const;
+    void reset(sf::Vector2f startPosition);
 };
