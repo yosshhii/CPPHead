@@ -79,6 +79,10 @@ int main() {
                 if (selectedIndex == 1) state = 2;
                 if (selectedIndex == 2) isRunning = false;
             }
+
+            menu.handleInput(window);
+            background.update({1,0}, dt, window, state);
+            drawMenu(window, background, level, menu);
         }
         else if (state == 1) {
             if (isEscPressed && !wasEscPressed) {
@@ -91,8 +95,9 @@ int main() {
             background.update(movement, dt, window, state);
             player.update(dt);
 
-            level.syncWithBackground(background);
-            level.playerGroundCollision(player, background);
+            float windowWidth = (float)window.getSize().x;
+
+            level.playerGroundCollision(player, dt, windowWidth, movement.x);
 
             drawGame(window, background, level, player);
         }
