@@ -21,7 +21,7 @@ void Background::update(const sf::Vector2f& movement, float dt, const sf::Render
         float speed = 200.f;
         sprite1.setPosition(sprite1.getPosition() - movement * speed * dt);
         sprite2.setPosition(sprite2.getPosition() - movement * speed * dt);
-    } else if (state == 0) {
+    } else if (state == 0 || state == 2) {
         float speed = 50.f;
         sprite1.setPosition(sprite1.getPosition() - movement * speed * dt);
         sprite2.setPosition(sprite2.getPosition() - movement * speed * dt);
