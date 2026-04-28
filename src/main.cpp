@@ -50,6 +50,14 @@ int main() {
             "assets/textures/Volume/Swiper/Swiper2.png",
             50.f
     );
+    Menu gameOverMenu(
+            {
+                    "assets/textures/Restart/Restart1.png",
+                    "assets/textures/Main Menu/Main Menu1.png"
+            },
+            "assets/textures/menu.png",
+            1
+    );
 
     sf::Clock clock;
 
@@ -71,8 +79,10 @@ int main() {
                 int selectedIndex = mainMenu.getSelectedIndex();
 
                 if (selectedIndex == 0) {
-                  state = 1;
-                  level.init();
+                    state = 1;
+                    level.init();
+
+                    player.reset({0.f, 200.f});
                 }
                 if (selectedIndex == 1) state = 2;
                 if (selectedIndex == 2) isRunning = false;
@@ -96,6 +106,10 @@ int main() {
             float windowWidth = (float)window.getSize().x;
 
             level.playerGroundCollision(player, dt, windowWidth, movement.x);
+
+            if (player.isDead()) {
+                state = 4;
+            }
 
             drawGame(window, background, level, player);
         }
@@ -128,6 +142,27 @@ int main() {
 
                 if (selectedIndex == 0) state = 1;
                 if (selectedIndex == 1) state = 0;
+            }
+        }
+        else if (state == 4) {
+            gameOverMenu.handleInput(window);
+
+            drawGameOver(window, background, level, player, gameOverMenu);
+
+            if (isEnterPressed && !wasEnterPressed) {
+                gameOverMenu.ButtonPicker();
+                int selectedIndex = gameOverMenu.getSelectedIndex();
+
+                if (selectedIndex == 0) {
+                    level.init();
+
+                    player.reset({0.f, 200.f});
+
+                    state = 1;
+                }
+                if (selectedIndex == 1) {
+                    state = 0;
+                }
             }
         }
 

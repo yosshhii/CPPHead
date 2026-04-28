@@ -30,6 +30,12 @@ void HealthComponent::update(float deltaTime) {
     }
 }
 
+void HealthComponent::reset() {
+    currentHealth = maxHealth;
+    invulnerable = false;
+    timer = 0.0f;
+}
+
 int HealthComponent::getHealth() const { return currentHealth; }
 int HealthComponent::getMaxHealth() const { return maxHealth; }
 bool HealthComponent::isDead() const { return currentHealth <= 0; }

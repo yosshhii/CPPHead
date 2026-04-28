@@ -12,3 +12,4 @@ void drawGame(sf::RenderWindow& window, Background& background, Level& level, Pl
 void drawMenu(sf::RenderWindow& window, Background& background, Level& level, Menu& menu);
 void drawSettings(sf::RenderWindow& window, Background& background, Level& level, Settings& settings);
 void drawPauseMenu(sf::RenderWindow& window, Background& background, Level& level, Player& player, Settings& pauseMenu);
+void drawGameOver(sf::RenderWindow& window, Background& background, Level& level, Player& player, Menu& gameOverMenu);

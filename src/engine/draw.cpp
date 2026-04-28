@@ -56,3 +56,23 @@ void drawPauseMenu(sf::RenderWindow& window, Background& background, Level& leve
 
     window.display();
 }
+
+void drawGameOver(sf::RenderWindow& window, Background& background, Level& level, Player& player, Menu& gameOverMenu) {
+    window.clear();
+
+    background.draw(window);
+    level.draw(window);
+    player.draw(window);
+
+    sf::View currentView = window.getView();
+    sf::RectangleShape redOverlay(currentView.getSize());
+    redOverlay.setOrigin({currentView.getSize().x / 2.0f, currentView.getSize().y / 2.0f});
+    redOverlay.setPosition(currentView.getCenter());
+
+    redOverlay.setFillColor(sf::Color(150, 0, 0, 180));
+    window.draw(redOverlay);
+
+    gameOverMenu.draw(window);
+
+    window.display();
+}
