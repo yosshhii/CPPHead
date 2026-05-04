@@ -93,6 +93,7 @@ public:
     sf::Vector2f getVelocity() const;
     bool getOnGround() const;
     bool getJumping() const;
+    sf::FloatRect getBounds() const;
 
     void setPosition(const sf::Vector2f& position);
     void setVelocityY(float value);

@@ -5,6 +5,7 @@
 #include "../game/level.hpp"
 #include "../game/menu.hpp"
 #include "../game/settings.hpp"
+#include "../game/enemy.hpp"
 
 void drawGame(sf::RenderWindow& window, Background& background, Level& level, Player& player) {
     window.clear();
@@ -13,7 +14,7 @@ void drawGame(sf::RenderWindow& window, Background& background, Level& level, Pl
     level.draw(window);
     player.draw(window);
 
-    window.display();
+
 }
 
 void drawMenu(sf::RenderWindow& window, Background& background, Level& level, Menu& menu) {

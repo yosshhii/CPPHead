@@ -358,3 +358,7 @@ void Player::reset(sf::Vector2f startPosition) {
     dustParticles.clear();
     jumpDustParticles.clear();
 }
+
+sf::FloatRect Player::getBounds() const {
+    return sprite.getGlobalBounds();
+}

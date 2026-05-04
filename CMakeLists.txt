@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 list(PREPEND CMAKE_PREFIX_PATH "/opt/homebrew/opt/sfml")
 
 add_executable(CPPHead src/main.cpp
-		src/game/obstacle.hpp
 		src/game/player.hpp
 		src/engine/window.hpp
 		src/engine/window.cpp
@@ -24,7 +23,9 @@ add_executable(CPPHead src/main.cpp
         src/game/health.cpp
 		src/game/settings.hpp
 		src/game/settings.cpp
-		src/game/levelmanager.hpp)
+		src/game/levelmanager.hpp
+		src/game/enemy.hpp
+		src/game/enemy.cpp)
 
 find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System Audio)
 target_link_libraries(CPPHead PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
