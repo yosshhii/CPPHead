@@ -111,9 +111,9 @@ int main() {
             }
 
             if (enemies.empty()) {
-                enemies.emplace_back(enemyTexture, sf::Vector2f(800.f, 400.f));
-                enemies.emplace_back(enemyTexture, sf::Vector2f(100.f, 400.f));
-                enemies.emplace_back(enemyTexture, sf::Vector2f(300.f, 400.f));
+                enemies.emplace_back(enemyTexture, sf::Vector2f(800.f, 200.f));
+                enemies.emplace_back(enemyTexture, sf::Vector2f(100.f, 200.f));
+                enemies.emplace_back(enemyTexture, sf::Vector2f(300.f, 200.f));
             }
 
             player.handleInput(window);
@@ -133,47 +133,6 @@ int main() {
 
             float windowWidth = (float)window.getSize().x;
             level.playerGroundCollision(player, dt, windowWidth, movement.x);
-
-            for (auto& enemy : enemies) {
-                if (enemy.getIsAlive()) {
-
-                    sf::FloatRect pBounds = player.getBounds();
-                    sf::FloatRect eBounds = enemy.getBounds();
-
-                    // --- МАГИЯ ЗДЕСЬ: Уменьшаем хитбоксы для SFML 3 ---
-                    float shrinkFactor = 0.6f; // 60% от оригинального размера
-
-                    // Сжимаем хитбокс игрока к центру
-                    float pShrinkX = pBounds.size.x * (1 - shrinkFactor);
-                    float pShrinkY = pBounds.size.y * (1 - shrinkFactor);
-
-                    pBounds.position.x += pShrinkX / 2;
-                    pBounds.position.y += pShrinkY / 2;
-                    pBounds.size.x *= shrinkFactor;
-                    pBounds.size.y *= shrinkFactor;
-
-                    // Сжимаем хитбокс врага к центру
-                    float eShrinkX = eBounds.size.x * (1 - shrinkFactor);
-                    float eShrinkY = eBounds.size.y * (1 - shrinkFactor);
-
-                    eBounds.position.x += eShrinkX / 2;
-                    eBounds.position.y += eShrinkY / 2;
-                    eBounds.size.x *= shrinkFactor;
-                    eBounds.size.y *= shrinkFactor;
-                    // ---------------------------------------
-
-                    bool isColliding =
-                        pBounds.position.x < eBounds.position.x + eBounds.size.x &&
-                        pBounds.position.x + pBounds.size.x > eBounds.position.x &&
-                        pBounds.position.y < eBounds.position.y + eBounds.size.y &&
-                        pBounds.position.y + pBounds.size.y > eBounds.position.y;
-
-                    if (isColliding) {
-                        player.applyDamage(1);
-                        break;
-                    }
-                }
-            }
 
             for (size_t i = 0; i < enemies.size(); ) {
                 if (!enemies[i].getIsAlive()) {

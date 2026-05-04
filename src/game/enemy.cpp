@@ -2,12 +2,12 @@
 
 Enemy::Enemy(sf::Texture& texture, sf::Vector2f position)
         : sprite(texture), health(1), speed(50.f), position(position) {
+    sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight)});
     sprite.setPosition(position);
     sprite.setScale({3.f, 2.f});
     sprite.setTextureRect(sf::IntRect(
                 {0, 0},
                 {frameWidth, frameHeight}));
-
 }
 
 void Enemy::update(float dt, sf::Vector2f playerPos) {
@@ -18,7 +18,7 @@ void Enemy::update(float dt, sf::Vector2f playerPos) {
         float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
         direction.x /= length; // нормализуем вектор
 
-        position += direction * speed * dt;
+        position.x += direction.x * speed * dt;
         sprite.setPosition(position);
     }
 }
@@ -45,10 +45,6 @@ void Enemy::death() {
 
 bool Enemy::getIsAlive() const {
     return isAlive;
-}
-
-sf::FloatRect Enemy::getBounds() const {
-    return sprite.getGlobalBounds();
 }
 
 sf::Sprite Enemy::getSprite() {
