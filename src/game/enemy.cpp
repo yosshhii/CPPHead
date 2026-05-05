@@ -146,3 +146,17 @@ float Enemy::getAttackRadius() const {
 sf::Vector2f Enemy::getScale() const {
     return sprite.getScale();
 }
+
+Hitbox Enemy::getBodyHitbox() const {
+    float width = 45.f;
+    float height = 80.f;
+
+    sf::Vector2f center = getHitboxCenter();
+
+    return {
+        center.x - width / 2.f,
+        center.y - height / 2.f,
+        width,
+        height
+    };
+}

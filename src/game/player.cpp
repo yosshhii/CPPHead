@@ -104,6 +104,8 @@ void Player::handleInput(const sf::RenderWindow& window) {
     if (attackPressed && !wasAttackPressed && !isAttacking) {
         isAttacking = true;
         attackFrame = 0;
+        animationTimer = 0.f;
+        attackDamageDealt = false;
     }
 
     wasAttackPressed = attackPressed;
@@ -385,4 +387,37 @@ void Player::reset(sf::Vector2f startPosition) {
 
     dustParticles.clear();
     jumpDustParticles.clear();
+}
+
+bool Player::getAttacking() const {
+    return isAttacking;
+}
+
+bool Player::canDealAttackDamage() const {
+    return isAttacking && !attackDamageDealt && attackFrame >= 1 && attackFrame <= 2;
+}
+
+void Player::markAttackDamageDealt() {
+    attackDamageDealt = true;
+}
+
+Hitbox Player::getAttackHitbox(float levelOffset) const {
+    sf::Vector2f playerScreenPos = sprite.getPosition();
+
+    float direction = sprite.getScale().x >= 0.f ? 1.f : -1.f;
+
+    float hitboxScreenX =
+        playerScreenPos.x + direction * attackHitboxOffsetX - (attackHitboxWidth / 2.f);
+
+    float hitboxScreenY =
+        playerScreenPos.y - attackHitboxOffsetY - (attackHitboxHeight / 2.f);
+
+    float hitboxWorldX = hitboxScreenX + levelOffset;
+
+    return {
+        hitboxWorldX,
+        hitboxScreenY,
+        attackHitboxWidth,
+        attackHitboxHeight
+    };
 }

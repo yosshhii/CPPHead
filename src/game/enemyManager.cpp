@@ -55,3 +55,31 @@ void EnemyManager::draw(sf::RenderWindow& window, float levelOffset) {
 std::vector<Enemy>& EnemyManager::getEnemies() {
     return enemies;
 }
+
+static bool intersects(const Hitbox& a, const Hitbox& b) {
+    return
+        a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y;
+}
+
+void EnemyManager::handlePlayerAttack(Player& player, float levelOffset) {
+    if (!player.canDealAttackDamage()) {
+        return;
+    }
+
+    Hitbox attackHitbox = player.getAttackHitbox(levelOffset);
+
+    for (auto& enemy : enemies) {
+        if (!enemy.getIsAlive()) continue;
+
+        Hitbox enemyHitbox = enemy.getBodyHitbox();
+
+        if (intersects(attackHitbox, enemyHitbox)) {
+            enemy.takeDamage(1);
+            player.markAttackDamageDealt();
+            break;
+        }
+    }
+}

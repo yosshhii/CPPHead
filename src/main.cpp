@@ -131,6 +131,8 @@ int main() {
             };
             enemyManager.update(dt, player, playerWorldFeet, playerWorldCenter);
 
+            enemyManager.handlePlayerAttack(player, levelOffset);
+
             for (auto& enemy : enemyManager.getEnemies()) {
                 level.enemyGroundCollision(enemy);
             }

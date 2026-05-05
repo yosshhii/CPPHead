@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "hitbox.hpp"
 
 class Enemy {
 private:
@@ -54,5 +55,6 @@ public:
     float getAttackRadius() const;
     sf::Vector2f getScale() const;
     sf::Vector2f getPosition() const;
+    Hitbox getBodyHitbox() const;
 
 };

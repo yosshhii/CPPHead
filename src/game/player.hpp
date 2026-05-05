@@ -3,6 +3,7 @@
 #include <SFML/Audio.hpp>
 
 #include "health.hpp"
+#include "hitbox.hpp"
 
 struct DustParticle {
     sf::Sprite sprite;
@@ -87,6 +88,12 @@ private:
     float healthBarPosY = 270.f;
     float healthBarScale = 0.6f;
 
+    bool attackDamageDealt = false;
+
+    float attackHitboxWidth = 70.f;
+    float attackHitboxHeight = 55.f;
+    float attackHitboxOffsetX = 45.f;
+    float attackHitboxOffsetY = 45.f;
 public:
     Player();
 
@@ -99,6 +106,7 @@ public:
     sf::Vector2f getVelocity() const;
     bool getOnGround() const;
     bool getJumping() const;
+    bool getAttacking() const;
     sf::FloatRect getBounds() const;
 
     void setPosition(const sf::Vector2f& position);
@@ -110,4 +118,9 @@ public:
     const HealthComponent& getHealth() const;
     bool isDead() const;
     void reset(sf::Vector2f startPosition);
+
+    bool canDealAttackDamage() const;
+    void markAttackDamageDealt();
+
+    Hitbox getAttackHitbox(float levelOffset) const;
 };

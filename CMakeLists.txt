@@ -27,7 +27,8 @@ add_executable(CPPHead src/main.cpp
 		src/game/enemy.hpp
 		src/game/enemy.cpp
 		src/game/enemyManager.hpp
-		src/game/enemyManager.cpp)
+		src/game/enemyManager.cpp
+		src/game/hitbox.hpp)
 
 find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System Audio)
 target_link_libraries(CPPHead PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
