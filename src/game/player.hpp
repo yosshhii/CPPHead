@@ -23,6 +23,7 @@ private:
     sf::Texture walkTexture;
     sf::Texture jumpTexture;
     sf::Texture attackTexture;
+    sf::Texture hurtTexture;
     sf::Texture runDustTexture;
     sf::Texture jumpDustTexture;
     sf::Sprite sprite;
@@ -45,12 +46,16 @@ private:
     int jumpFrame = 0;
     int attackFrame = 0;
 
+    int hurtFrame = 1;
+    int hurtFramesCount = 4;
+
     float animationTimer = 0.f;
     float jumpPeakTimer = 0.f;
     float dustTimer = 0.f;
     float animationSpeed = 0.12f;
     float attackDuration = 0.1f;
     float jumpDuration = 0.12f;
+    float hurtAnimationTimer = 0.f;
 
     float dustScale = 2.f;
     float dustLifeTime = 0.4f;
@@ -68,6 +73,7 @@ private:
     bool isOnGround = true;
     bool isJumping = false;
     bool isAttacking = false;
+    bool isHurt = false;
 
     bool wasAttackPressed = false;
 
