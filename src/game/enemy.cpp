@@ -9,13 +9,15 @@ Enemy::Enemy(sf::Texture& texture, sf::Vector2f position)
         : sprite(texture), health(1), speed(50.f), position(position) {
     sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight) - footFixY});
     sprite.setPosition(position);
-    sprite.setScale({3.f, 2.f});
+    sprite.setScale({enemyScaleX, enemyScaleY});
     sprite.setTextureRect(sf::IntRect(
                 {0, 0},
                 {frameWidth, frameHeight}));
 }
 
 void Enemy::update(float dt, sf::Vector2f playerPos) {
+    bool isMoving = false;
+
     if (!isOnGround) {
         velocityY += 900.f * dt;
     }
@@ -30,13 +32,35 @@ void Enemy::update(float dt, sf::Vector2f playerPos) {
         direction.x /= length; // нормализуем вектор
 
         if (direction.x < 0) {
-            sprite.setScale({3.f, 2.f});
-        } else {sprite.setScale({-3.f, 2.f});}
+            sprite.setScale({enemyScaleX, enemyScaleY});
+        } else {sprite.setScale({-enemyScaleX, enemyScaleY});}
 
         position.x += direction.x * speed * dt;
-
+        isMoving = true;
     }
+
+    updateAnimation(dt, isMoving);
+
     sprite.setPosition(position);
+}
+
+void Enemy::updateAnimation(float dt, bool isMoving) {
+    if (isMoving) {
+        animationTimer += dt;
+
+        if (animationTimer >= animationSpeed) {
+            animationTimer = 0.f;
+            walkFrame = (walkFrame + 1) % walkFramesCount;
+        }
+    } else {
+        walkFrame = 0;
+        animationTimer = 0.f;
+    }
+
+    sprite.setTextureRect(sf::IntRect(
+        {walkFrame * frameWidth, 0},
+        {frameWidth, frameHeight}
+    ));
 }
 
 bool Enemy::canAttack(sf::Vector2f playerCenter) const {

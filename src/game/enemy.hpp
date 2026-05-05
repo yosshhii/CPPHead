@@ -10,6 +10,15 @@ private:
     float chaseRadius = 300.f;
     float attackRadius = 50.f;
 
+    int walkFrame = 0;
+    int walkFramesCount = 6;
+
+    float animationTimer = 0.f;
+    float animationSpeed = 0.12f;
+
+    float enemyScaleX = 3.f;
+    float enemyScaleY = 2.f;
+
     float velocityY = 0.f;
     bool isOnGround = false;
 
@@ -25,6 +34,7 @@ public:
     Enemy(sf::Texture& texture, sf::Vector2f position);
 
     void update(float dt, sf::Vector2f playerPos);
+    void updateAnimation(float dt, bool isMoving);
     void takeDamage(int damage);
     bool canAttack(sf::Vector2f playerPos) const;
     void death();
@@ -39,4 +49,5 @@ public:
     float getAttackRadius() const;
     sf::Vector2f getScale() const;
     sf::Vector2f getPosition() const;
+
 };

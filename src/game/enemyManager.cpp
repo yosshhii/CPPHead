@@ -2,7 +2,7 @@
 
 EnemyManager::EnemyManager() {
     if (!skeletonTexture.loadFromFile(
-        "assets/textures/SkeletonEnemy/Idle/Sword/Skeleton_Default_Idle_Sword.png"
+        "assets/textures/SkeletonEnemy/Run/Sword/Skeleton_Default_Run_Sword.png"
     )) {
         throw std::runtime_error("Failed to load skeleton texture");
     }
