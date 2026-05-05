@@ -1,0 +1,21 @@
+#pragma once
+
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include "enemy.hpp"
+#include "player.hpp"
+
+class EnemyManager {
+private:
+    std::vector<Enemy> enemies;
+    sf::Texture skeletonTexture;
+
+public:
+    EnemyManager();
+
+    void spawnSkeleton(sf::Vector2f position);
+    void update(float dt, Player& player, sf::Vector2f playerWorldPos);
+    void draw(sf::RenderWindow& window, float bgOffset);
+
+    std::vector<Enemy>& getEnemies();
+};

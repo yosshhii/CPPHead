@@ -8,6 +8,7 @@ private:
     int health;
     float speed;
     float chaseRadius = 300.f;
+    float attackRadius = 45.f;
 
     int frameWidth = 64;
     int frameHeight = 64;
@@ -20,13 +21,14 @@ public:
 
     void update(float dt, sf::Vector2f playerPos);
     void takeDamage(int damage);
+    bool canAttack(sf::Vector2f playerPos) const;
     void death();
-    void draw(sf::RenderWindow &window);
 
     sf::Sprite getSprite();
     bool getIsAlive() const;
+    sf::Vector2f getHitboxCenter() const;
 
-    sf::Vector2f getPosition();
+    sf::Vector2f getPosition() const;
 
     void setPosition(sf::Vector2f pos);
 };

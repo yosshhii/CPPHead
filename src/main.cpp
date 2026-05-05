@@ -10,6 +10,7 @@
 #include "game/menu.hpp"
 #include "game/settings.hpp"
 #include "game/enemy.hpp"
+#include "game/enemyManager.hpp"
 
 int main() {
     sf::RenderWindow window = createWindow();
@@ -60,20 +61,14 @@ int main() {
             "assets/textures/menu.png",
             1
     );
+    EnemyManager enemyManager;
+
 
     sf::Clock clock;
 
     int state = 0;
     bool wasEnterPressed = false;
     bool wasEscPressed = false;
-
-
-    sf::Texture enemyTexture;
-    if (!enemyTexture.loadFromFile("assets/textures/SkeletonEnemy/Idle/Sword/Skeleton_Default_Idle_Sword.png")) {
-        std::cerr << "[ERROR] Failed to load enemy texture!" << std::endl;
-    }
-
-    std::vector<Enemy> enemies;
 
     bool isRunning = true;
     while (isRunning) {
@@ -110,11 +105,10 @@ int main() {
                 state = 3;
             }
 
-            if (enemies.empty()) {
-                enemies.emplace_back(enemyTexture, sf::Vector2f(800.f, 200.f));
-                enemies.emplace_back(enemyTexture, sf::Vector2f(100.f, 200.f));
-                enemies.emplace_back(enemyTexture, sf::Vector2f(300.f, 200.f));
-            }
+
+            enemyManager.spawnSkeleton({800.f, 200.f});
+            enemyManager.spawnSkeleton({100.f, 200.f});
+            enemyManager.spawnSkeleton({300.f, 200.f});
 
             player.handleInput(window);
             sf::Vector2f movement = player.getMovement();
@@ -124,42 +118,20 @@ int main() {
 
             float bgOffset = background.getOffsetX();
 
-            for (auto& enemy : enemies) {
-                sf::Vector2f playerWorldPos = player.getPosition();
-                playerWorldPos.x -= bgOffset;
-
-                enemy.update(dt, playerWorldPos);
-            }
+            sf::Vector2f playerWorldPos = {
+                player.getPosition().x - bgOffset,
+                player.getPosition().y
+            };
+            enemyManager.update(dt, player, playerWorldPos);
 
             float windowWidth = (float)window.getSize().x;
             level.playerGroundCollision(player, dt, windowWidth, movement.x);
-
-            for (size_t i = 0; i < enemies.size(); ) {
-                if (!enemies[i].getIsAlive()) {
-                    enemies.erase(enemies.begin() + i);
-                } else {
-                    i++;
-                }
-            }
 
             if (player.isDead()) {
                 state = 4;
             }
 
-            drawGame(window, background, level, player);
-
-            for (auto& enemy : enemies) {
-                if (enemy.getIsAlive()) {
-                    sf::Sprite sprite = enemy.getSprite();
-
-                    sf::Vector2f originalPos = sprite.getPosition();
-                    sprite.setPosition({originalPos.x + bgOffset, originalPos.y});
-
-                    window.draw(sprite);
-                    sprite.setPosition(originalPos);
-                }
-            }
-            window.display();
+            drawGame(window, background, level, player, enemyManager, bgOffset);
         }
         // --- STATE 2: SETTINGS ---
         else if (state == 2) {
