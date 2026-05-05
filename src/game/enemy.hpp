@@ -8,10 +8,15 @@ private:
     int health;
     float speed;
     float chaseRadius = 300.f;
-    float attackRadius = 45.f;
+    float attackRadius = 50.f;
+
+    float velocityY = 0.f;
+    bool isOnGround = false;
 
     int frameWidth = 64;
     int frameHeight = 64;
+
+    float footFixY = 16.f;
 
     sf::Vector2f position;
 
@@ -24,11 +29,14 @@ public:
     bool canAttack(sf::Vector2f playerPos) const;
     void death();
 
+    void setVelocityY(float velocity);
+    void setOnGround(bool value);
+    void setPosition(sf::Vector2f pos);
+
     sf::Sprite getSprite();
     bool getIsAlive() const;
     sf::Vector2f getHitboxCenter() const;
-
+    float getAttackRadius() const;
+    sf::Vector2f getScale() const;
     sf::Vector2f getPosition() const;
-
-    void setPosition(sf::Vector2f pos);
 };

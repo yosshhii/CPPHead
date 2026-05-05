@@ -14,7 +14,7 @@ public:
     EnemyManager();
 
     void spawnSkeleton(sf::Vector2f position);
-    void update(float dt, Player& player, sf::Vector2f playerWorldPos);
+    void update(float dt, Player& player, sf::Vector2f playerWorldFeet, sf::Vector2f playerWorldCenter);
     void draw(sf::RenderWindow& window, float bgOffset);
 
     std::vector<Enemy>& getEnemies();

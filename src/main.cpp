@@ -105,7 +105,6 @@ int main() {
                 state = 3;
             }
 
-
             enemyManager.spawnSkeleton({800.f, 200.f});
             enemyManager.spawnSkeleton({100.f, 200.f});
             enemyManager.spawnSkeleton({300.f, 200.f});
@@ -116,22 +115,31 @@ int main() {
             background.update(movement, dt, window, state);
             player.update(dt);
 
-            float bgOffset = background.getOffsetX();
-
-            sf::Vector2f playerWorldPos = {
-                player.getPosition().x - bgOffset,
-                player.getPosition().y
-            };
-            enemyManager.update(dt, player, playerWorldPos);
-
             float windowWidth = (float)window.getSize().x;
             level.playerGroundCollision(player, dt, windowWidth, movement.x);
+
+            float levelOffset = level.getWorldOffset();
+
+            sf::Vector2f playerWorldFeet = {
+                player.getPosition().x + levelOffset,
+                player.getPosition().y
+            };
+
+            sf::Vector2f playerWorldCenter = {
+                player.getPosition().x + levelOffset,
+                player.getPosition().y - 32.f
+            };
+            enemyManager.update(dt, player, playerWorldFeet, playerWorldCenter);
+
+            for (auto& enemy : enemyManager.getEnemies()) {
+                level.enemyGroundCollision(enemy);
+            }
 
             if (player.isDead()) {
                 state = 4;
             }
 
-            drawGame(window, background, level, player, enemyManager, bgOffset);
+            drawGame(window, background, level, player, enemyManager, levelOffset);
         }
         // --- STATE 2: SETTINGS ---
         else if (state == 2) {

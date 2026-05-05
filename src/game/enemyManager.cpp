@@ -14,9 +14,9 @@ void EnemyManager::spawnSkeleton(sf::Vector2f position) {
     }
 }
 
-void EnemyManager::update(float dt, Player& player, sf::Vector2f playerWorldPos) {
+void EnemyManager::update(float dt, Player& player, sf::Vector2f playerWorldFeet, sf::Vector2f playerWorldCenter) {
     for (auto& enemy : enemies) {
-        enemy.update(dt, playerWorldPos);
+        enemy.update(dt, playerWorldFeet);
     }
 
     for (size_t i = 0; i < enemies.size(); ) {
@@ -28,21 +28,19 @@ void EnemyManager::update(float dt, Player& player, sf::Vector2f playerWorldPos)
     }
 
     for (auto& enemy : enemies) {
-        enemy.update(dt, playerWorldPos);
-
-        if (enemy.canAttack(playerWorldPos)) {
+        if (enemy.canAttack(playerWorldCenter)) {
             player.applyDamage(1);
         }
     }
 }
 
-void EnemyManager::draw(sf::RenderWindow& window, float bgOffset) {
+void EnemyManager::draw(sf::RenderWindow& window, float levelOffset) {
     for (auto& enemy : enemies) {
         if (enemy.getIsAlive()) {
             sf::Sprite sprite = enemy.getSprite();
 
             sf::Vector2f pos = enemy.getPosition();
-            sprite.setPosition({pos.x + bgOffset, pos.y});
+            sprite.setPosition({pos.x - levelOffset, pos.y});
 
             window.draw(sprite);
         }

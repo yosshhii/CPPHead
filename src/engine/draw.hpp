@@ -17,7 +17,7 @@ class Settings;
 class Enemy;
 class EnemyManager;
 
-void drawGame(sf::RenderWindow& window, Background& background, Level& level, Player& player, EnemyManager& enemyManager, float bgOffset);
+void drawGame(sf::RenderWindow& window, Background& background, Level& level, Player& player, EnemyManager& enemyManager, float levelOffset);
 void drawMenu(sf::RenderWindow& window, Background& background, Level& level, Menu& menu);
 void drawSettings(sf::RenderWindow& window, Background& background, Level& level, Settings& settings);
 void drawPauseMenu(sf::RenderWindow& window, Background& background, Level& level, Player& player, Settings& pauseMenu);

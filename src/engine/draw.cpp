@@ -1,12 +1,12 @@
 #include "draw.hpp"
 
-void drawGame(sf::RenderWindow& window, Background& background, Level& level, Player& player, EnemyManager& enemyManager, float bgOffset) {
+void drawGame(sf::RenderWindow& window, Background& background, Level& level, Player& player, EnemyManager& enemyManager, float levelOffset) {
     window.clear();
 
     background.draw(window);
     level.draw(window);
     player.draw(window);
-    enemyManager.draw(window, bgOffset);
+    enemyManager.draw(window, levelOffset);
 
     window.display();
 }

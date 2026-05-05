@@ -7,7 +7,7 @@
 
 Enemy::Enemy(sf::Texture& texture, sf::Vector2f position)
         : sprite(texture), health(1), speed(50.f), position(position) {
-    sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight)});
+    sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight) - footFixY});
     sprite.setPosition(position);
     sprite.setScale({3.f, 2.f});
     sprite.setTextureRect(sf::IntRect(
@@ -16,6 +16,12 @@ Enemy::Enemy(sf::Texture& texture, sf::Vector2f position)
 }
 
 void Enemy::update(float dt, sf::Vector2f playerPos) {
+    if (!isOnGround) {
+        velocityY += 900.f * dt;
+    }
+
+    position.y += velocityY * dt;
+
     float distance = std::sqrt(std::pow(playerPos.x - position.x, 2) + std::pow(playerPos.y - position.y, 2));
 
     if (distance <= chaseRadius) {
@@ -28,19 +34,26 @@ void Enemy::update(float dt, sf::Vector2f playerPos) {
         } else {sprite.setScale({-3.f, 2.f});}
 
         position.x += direction.x * speed * dt;
-        sprite.setPosition(position);
+
     }
+    sprite.setPosition(position);
 }
 
-bool Enemy::canAttack(sf::Vector2f playerPos) const {
-    sf::Vector2f hitboxCenter = getHitboxCenter();
+bool Enemy::canAttack(sf::Vector2f playerCenter) const {
+    sf::Vector2f enemyCenter = getHitboxCenter();
 
-    float dx = playerPos.x - hitboxCenter.x;
-    float dy = playerPos.y - hitboxCenter.y;
+    float attackWidth = 70.f;
+    float attackHeight = 70.f;
 
-    float distance = std::sqrt(dx * dx + dy * dy);
+    bool insideX =
+        playerCenter.x >= enemyCenter.x - attackWidth / 2.f &&
+        playerCenter.x <= enemyCenter.x + attackWidth / 2.f;
 
-    return distance <= attackRadius;
+    bool insideY =
+        playerCenter.y >= enemyCenter.y - attackHeight / 2.f &&
+        playerCenter.y <= enemyCenter.y + attackHeight / 2.f;
+
+    return insideX && insideY;
 }
 
 void Enemy::takeDamage(int damage) {
@@ -78,4 +91,20 @@ sf::Vector2f Enemy::getPosition() const {
 void Enemy::setPosition(sf::Vector2f pos) {
     position = pos;
     sprite.setPosition(pos);
+}
+
+void Enemy::setVelocityY(float velocity) {
+    velocityY = velocity;
+}
+
+void Enemy::setOnGround(bool value) {
+    isOnGround = value;
+}
+
+float Enemy::getAttackRadius() const {
+    return attackRadius;
+}
+
+sf::Vector2f Enemy::getScale() const {
+    return sprite.getScale();
 }

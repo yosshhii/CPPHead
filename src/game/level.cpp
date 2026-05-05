@@ -42,3 +42,29 @@ void Level::playerGroundCollision(Player& player, float dt, float windowWidth, f
         player.setOnGround(false);
     }
 }
+void Level::enemyGroundCollision(Enemy& enemy) {
+    sf::Vector2f pos = enemy.getPosition();
+
+    sf::Vector2f checkPos = {
+        pos.x,
+        pos.y + 2.f
+    };
+
+    if (levelManager.checkCollisionWorld(checkPos)) {
+        sf::Vector2f correctionPos = pos;
+
+        while (levelManager.checkCollisionWorld(correctionPos) && correctionPos.y > 0) {
+            correctionPos.y -= 1.f;
+        }
+
+        enemy.setPosition({pos.x, correctionPos.y});
+        enemy.setVelocityY(0.f);
+        enemy.setOnGround(true);
+    } else {
+        enemy.setOnGround(false);
+    }
+}
+
+float Level::getWorldOffset() const {
+    return levelManager.getWorldOffset();
+}

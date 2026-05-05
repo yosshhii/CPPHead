@@ -142,6 +142,34 @@ public:
         return false;
     }
 
+    bool checkCollisionWorld(sf::Vector2f worldPos) {
+        float worldPosX = worldPos.x;
+
+        for (const auto& [x, b] : worldBlocks) {
+            float width = static_cast<float>(b.mask.getSize().x);
+
+            if (worldPosX >= b.posX && worldPosX < b.posX + width) {
+                float localX = worldPosX - b.posX;
+                float localY = worldPos.y;
+
+                if (localX >= 0 &&
+                    localY >= 0 &&
+                    localX < static_cast<float>(b.mask.getSize().x) &&
+                    localY < static_cast<float>(b.mask.getSize().y)) {
+
+                    sf::Color color = b.mask.getPixel({
+                        static_cast<unsigned int>(localX),
+                        static_cast<unsigned int>(localY)
+                    });
+
+                    return color.r < 50 && color.a > 200;
+                    }
+            }
+        }
+
+        return false;
+    }
+
     void draw(sf::RenderWindow& window) {
         for (auto& [x, b] : worldBlocks) {
             float screenX = b.posX - worldOffset;
@@ -150,5 +178,9 @@ public:
                 window.draw(b.visual);
             }
         }
+    }
+
+    float getWorldOffset() const {
+        return worldOffset;
     }
 };

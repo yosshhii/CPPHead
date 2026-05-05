@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "levelmanager.hpp"
+#include "enemy.hpp"
 #include <cmath>
 
 class Player;
@@ -17,8 +18,9 @@ public:
     Level();
 
     void init();
-    void update(float dt, float windowWidth);
     void draw(sf::RenderWindow& window);
     void playerGroundCollision(Player& player, float dt, float windowWidth, float inputX);
-    bool checkCollision(sf::Vector2f position);
+    void enemyGroundCollision(Enemy& enemy);
+
+    float getWorldOffset() const;
 };
