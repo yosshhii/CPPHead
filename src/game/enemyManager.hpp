@@ -8,7 +8,8 @@
 class EnemyManager {
 private:
     std::vector<Enemy> enemies;
-    sf::Texture skeletonTexture;
+    sf::Texture skeletonIdleTexture;
+    sf::Texture skeletonWalkTexture;
 
 public:
     EnemyManager();

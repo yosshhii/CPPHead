@@ -1,8 +1,13 @@
 #include "enemyManager.hpp"
 
 EnemyManager::EnemyManager() {
-    if (!skeletonTexture.loadFromFile(
+    if (!skeletonWalkTexture.loadFromFile(
         "assets/textures/SkeletonEnemy/Run/Sword/Skeleton_Default_Run_Sword.png"
+    )) {
+        throw std::runtime_error("Failed to load skeleton texture");
+    }
+    if (!skeletonIdleTexture.loadFromFile(
+        "assets/textures/SkeletonEnemy/Idle/Sword/Skeleton_Default_Idle_Sword.png"
     )) {
         throw std::runtime_error("Failed to load skeleton texture");
     }
@@ -10,7 +15,7 @@ EnemyManager::EnemyManager() {
 
 void EnemyManager::spawnSkeleton(sf::Vector2f position) {
     if (enemies.size() < 3) {
-        enemies.emplace_back(skeletonTexture, position);
+        enemies.emplace_back(skeletonIdleTexture, skeletonWalkTexture, position);
     }
 }
 

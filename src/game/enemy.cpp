@@ -5,8 +5,8 @@
 #include "background.hpp"
 #include "player.hpp"
 
-Enemy::Enemy(sf::Texture& texture, sf::Vector2f position)
-        : sprite(texture), health(1), speed(50.f), position(position) {
+Enemy::Enemy(sf::Texture& idleTexture, sf::Texture& walkTexture, sf::Vector2f position)
+: sprite(idleTexture), idleTexture(&idleTexture), walkTexture(&walkTexture), health(1), speed(50.f), position(position) {
     sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight) - footFixY});
     sprite.setPosition(position);
     sprite.setScale({enemyScaleX, enemyScaleY});
@@ -46,21 +46,35 @@ void Enemy::update(float dt, sf::Vector2f playerPos) {
 
 void Enemy::updateAnimation(float dt, bool isMoving) {
     if (isMoving) {
+        idleFrame = 0;
         animationTimer += dt;
+        sprite.setTexture(*walkTexture);
 
         if (animationTimer >= animationSpeed) {
             animationTimer = 0.f;
             walkFrame = (walkFrame + 1) % walkFramesCount;
         }
-    } else {
-        walkFrame = 0;
-        animationTimer = 0.f;
-    }
 
-    sprite.setTextureRect(sf::IntRect(
+        sprite.setTextureRect(sf::IntRect(
         {walkFrame * frameWidth, 0},
         {frameWidth, frameHeight}
-    ));
+        ));
+    } else {
+        walkFrame = 0;
+        animationTimer += dt;
+        sprite.setTexture(*idleTexture);
+
+        if (animationTimer >= animationSpeed) {
+            animationTimer = 0.f;
+            idleFrame = (idleFrame + 1) % idleFramesCount;
+        }
+
+        sprite.setTextureRect(sf::IntRect(
+        {idleFrame * frameWidth, 0},
+        {frameWidth, frameHeight}
+        ));
+    }
+
 }
 
 bool Enemy::canAttack(sf::Vector2f playerCenter) const {

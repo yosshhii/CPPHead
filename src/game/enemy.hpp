@@ -4,6 +4,9 @@
 
 class Enemy {
 private:
+    sf::Texture* idleTexture = nullptr;
+    sf::Texture* walkTexture = nullptr;
+
     sf::Sprite sprite;
     int health;
     float speed;
@@ -11,7 +14,9 @@ private:
     float attackRadius = 50.f;
 
     int walkFrame = 0;
+    int idleFrame = 0;
     int walkFramesCount = 6;
+    int idleFramesCount = 6;
 
     float animationTimer = 0.f;
     float animationSpeed = 0.12f;
@@ -31,7 +36,7 @@ private:
 
     bool isAlive = true;
 public:
-    Enemy(sf::Texture& texture, sf::Vector2f position);
+    Enemy(sf::Texture& idleTexture, sf::Texture& walkTexture, sf::Vector2f position);
 
     void update(float dt, sf::Vector2f playerPos);
     void updateAnimation(float dt, bool isMoving);
