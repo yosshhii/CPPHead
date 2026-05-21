@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 #include "engine/window.hpp"
 #include "engine/draw.hpp"
@@ -8,6 +9,8 @@
 #include "game/level.hpp"
 #include "game/menu.hpp"
 #include "game/settings.hpp"
+#include "game/enemy.hpp"
+#include "game/enemyManager.hpp"
 
 int main() {
     sf::RenderWindow window = createWindow();
@@ -58,6 +61,8 @@ int main() {
             "assets/textures/menu.png",
             1
     );
+    EnemyManager enemyManager;
+
 
     sf::Clock clock;
 
@@ -73,6 +78,7 @@ int main() {
         bool isEnterPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter);
         bool isEscPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape);
 
+        // --- STATE 0: MENU ---
         if (state == 0) {
             if (isEnterPressed && !wasEnterPressed) {
                 mainMenu.ButtonPicker();
@@ -81,8 +87,8 @@ int main() {
                 if (selectedIndex == 0) {
                     state = 1;
                     level.init();
-
                     player.reset({0.f, 200.f});
+                    enemyManager.reset();
                 }
                 if (selectedIndex == 1) state = 2;
                 if (selectedIndex == 2) isRunning = false;
@@ -92,6 +98,8 @@ int main() {
             background.update({1,0}, dt, window, state);
             drawMenu(window, background, level, mainMenu);
         }
+
+        // --- STATE 1: GAME ---
         else if (state == 1) {
             if (isEscPressed && !wasEscPressed) {
                 state = 3;
@@ -104,15 +112,34 @@ int main() {
             player.update(dt);
 
             float windowWidth = (float)window.getSize().x;
-
             level.playerGroundCollision(player, dt, windowWidth, movement.x);
+
+            float levelOffset = level.getWorldOffset();
+
+            sf::Vector2f playerWorldFeet = {
+                player.getPosition().x + levelOffset,
+                player.getPosition().y
+            };
+
+            sf::Vector2f playerWorldCenter = {
+                player.getPosition().x + levelOffset,
+                player.getPosition().y - 32.f
+            };
+            enemyManager.update(dt, player, playerWorldFeet, playerWorldCenter);
+
+            enemyManager.handlePlayerAttack(player, levelOffset);
+
+            for (auto& enemy : enemyManager.getEnemies()) {
+                level.enemyGroundCollision(enemy);
+            }
 
             if (player.isDead()) {
                 state = 4;
             }
 
-            drawGame(window, background, level, player);
+            drawGame(window, background, level, player, enemyManager, levelOffset);
         }
+        // --- STATE 2: SETTINGS ---
         else if (state == 2) {
             settingsMenu.handleInput(window);
             background.update({1,0}, dt, window, state);
@@ -123,10 +150,11 @@ int main() {
 
                 int selectedIndex = settingsMenu.getSelectedIndex();
 
-                if (selectedIndex == 0) ;
+                if (selectedIndex == 0) {}
                 if (selectedIndex == 1) state = 0;
             }
         }
+        // --- STATE 3: PAUSE ---
         else if (state == 3) {
             pauseMenu.handleInput(window);
 
@@ -144,6 +172,7 @@ int main() {
                 if (selectedIndex == 1) state = 0;
             }
         }
+        // --- STATE 4: GAME_OVER ---
         else if (state == 4) {
             gameOverMenu.handleInput(window);
 
@@ -155,9 +184,8 @@ int main() {
 
                 if (selectedIndex == 0) {
                     level.init();
-
                     player.reset({0.f, 200.f});
-
+                    enemyManager.reset();
                     state = 1;
                 }
                 if (selectedIndex == 1) {

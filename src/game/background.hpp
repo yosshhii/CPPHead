@@ -24,4 +24,6 @@ public:
 
     float getWidth() const;
     float getHeight() const;
+
+    float getOffsetX() const;
 };

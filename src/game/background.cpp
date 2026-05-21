@@ -65,3 +65,7 @@ float Background::getWidth() const {
 float Background::getHeight() const {
     return height;
 }
+
+float Background::getOffsetX() const {
+    return sprite1.getPosition().x;
+}

@@ -3,6 +3,7 @@
 #include <SFML/Audio.hpp>
 
 #include "health.hpp"
+#include "hitbox.hpp"
 
 struct DustParticle {
     sf::Sprite sprite;
@@ -23,6 +24,7 @@ private:
     sf::Texture walkTexture;
     sf::Texture jumpTexture;
     sf::Texture attackTexture;
+    sf::Texture hurtTexture;
     sf::Texture runDustTexture;
     sf::Texture jumpDustTexture;
     sf::Sprite sprite;
@@ -45,12 +47,16 @@ private:
     int jumpFrame = 0;
     int attackFrame = 0;
 
+    int hurtFrame = 1;
+    int hurtFramesCount = 4;
+
     float animationTimer = 0.f;
     float jumpPeakTimer = 0.f;
     float dustTimer = 0.f;
     float animationSpeed = 0.12f;
     float attackDuration = 0.1f;
     float jumpDuration = 0.12f;
+    float hurtAnimationTimer = 0.f;
 
     float dustScale = 2.f;
     float dustLifeTime = 0.4f;
@@ -68,6 +74,7 @@ private:
     bool isOnGround = true;
     bool isJumping = false;
     bool isAttacking = false;
+    bool isHurt = false;
 
     bool wasAttackPressed = false;
 
@@ -81,6 +88,12 @@ private:
     float healthBarPosY = 270.f;
     float healthBarScale = 0.6f;
 
+    bool attackDamageDealt = false;
+
+    float attackHitboxWidth = 70.f;
+    float attackHitboxHeight = 55.f;
+    float attackHitboxOffsetX = 45.f;
+    float attackHitboxOffsetY = 45.f;
 public:
     Player();
 
@@ -93,6 +106,8 @@ public:
     sf::Vector2f getVelocity() const;
     bool getOnGround() const;
     bool getJumping() const;
+    bool getAttacking() const;
+    sf::FloatRect getBounds() const;
 
     void setPosition(const sf::Vector2f& position);
     void setVelocityY(float value);
@@ -103,4 +118,9 @@ public:
     const HealthComponent& getHealth() const;
     bool isDead() const;
     void reset(sf::Vector2f startPosition);
+
+    bool canDealAttackDamage() const;
+    void markAttackDamageDealt();
+
+    Hitbox getAttackHitbox(float levelOffset) const;
 };

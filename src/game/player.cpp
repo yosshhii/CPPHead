@@ -4,6 +4,7 @@ Player::Player()
         : walkTexture("assets/textures/Owlet_Monster_Walk.png"),
         jumpTexture("assets/textures/Owlet_Monster_Jump.png"),
         attackTexture("assets/textures/Owlet_Monster_Attack.png"),
+        hurtTexture("assets/textures/Owlet_Monster_Hurt.png"),
         sprite(walkTexture),
         walk1Buffer("assets/sounds/walk1.wav"),
         walk2Buffer("assets/sounds/walk2.wav"),
@@ -103,6 +104,8 @@ void Player::handleInput(const sf::RenderWindow& window) {
     if (attackPressed && !wasAttackPressed && !isAttacking) {
         isAttacking = true;
         attackFrame = 0;
+        animationTimer = 0.f;
+        attackDamageDealt = false;
     }
 
     wasAttackPressed = attackPressed;
@@ -125,7 +128,28 @@ void Player::update(float dt) {
 
     bool isMoving = (movement.x != 0);
 
-    if (isAttacking) {
+    if (isHurt) {
+        sprite.setTexture(hurtTexture);
+
+        hurtAnimationTimer += dt;
+
+        if (hurtAnimationTimer >= animationSpeed) {
+            hurtAnimationTimer = 0.f;
+
+            if (hurtFrame < hurtFramesCount - 3) {
+                hurtFrame++;
+            } else {
+                isHurt = false;
+                hurtFrame = 1;
+            }
+        }
+
+        sprite.setTextureRect(sf::IntRect(
+            {hurtFrame * frameWidth, 0},
+            {frameWidth, frameHeight}
+        ));
+    }
+    else if (isAttacking) {
         sprite.setTexture(attackTexture);
 
         animationTimer += dt;
@@ -334,6 +358,11 @@ void Player::setJumping(bool value) {
 
 void Player::applyDamage(int amount) {
     health.takeDamage(amount);
+
+    isHurt = true;
+    hurtFrame = 1;
+    hurtAnimationTimer = 0.f;
+
 }
 
 const HealthComponent& Player::getHealth() const {
@@ -350,6 +379,7 @@ void Player::reset(sf::Vector2f startPosition) {
     isOnGround = false;
     isJumping = false;
     isAttacking = false;
+    isHurt = false;
 
     sprite.setTextureRect(sf::IntRect({0, 0}, {frameWidth, frameHeight}));
 
@@ -357,4 +387,37 @@ void Player::reset(sf::Vector2f startPosition) {
 
     dustParticles.clear();
     jumpDustParticles.clear();
+}
+
+bool Player::getAttacking() const {
+    return isAttacking;
+}
+
+bool Player::canDealAttackDamage() const {
+    return isAttacking && !attackDamageDealt && attackFrame >= 1 && attackFrame <= 2;
+}
+
+void Player::markAttackDamageDealt() {
+    attackDamageDealt = true;
+}
+
+Hitbox Player::getAttackHitbox(float levelOffset) const {
+    sf::Vector2f playerScreenPos = sprite.getPosition();
+
+    float direction = sprite.getScale().x >= 0.f ? 1.f : -1.f;
+
+    float hitboxScreenX =
+        playerScreenPos.x + direction * attackHitboxOffsetX - (attackHitboxWidth / 2.f);
+
+    float hitboxScreenY =
+        playerScreenPos.y - attackHitboxOffsetY - (attackHitboxHeight / 2.f);
+
+    float hitboxWorldX = hitboxScreenX + levelOffset;
+
+    return {
+        hitboxWorldX,
+        hitboxScreenY,
+        attackHitboxWidth,
+        attackHitboxHeight
+    };
 }
