@@ -87,8 +87,8 @@ int main() {
                 if (selectedIndex == 0) {
                     state = 1;
                     level.init();
-
                     player.reset({0.f, 200.f});
+                    enemyManager.reset();
                 }
                 if (selectedIndex == 1) state = 2;
                 if (selectedIndex == 2) isRunning = false;
@@ -104,10 +104,6 @@ int main() {
             if (isEscPressed && !wasEscPressed) {
                 state = 3;
             }
-
-            enemyManager.spawnSkeleton({800.f, 200.f});
-            enemyManager.spawnSkeleton({100.f, 200.f});
-            enemyManager.spawnSkeleton({300.f, 200.f});
 
             player.handleInput(window);
             sf::Vector2f movement = player.getMovement();
@@ -188,9 +184,8 @@ int main() {
 
                 if (selectedIndex == 0) {
                     level.init();
-
                     player.reset({0.f, 200.f});
-
+                    enemyManager.reset();
                     state = 1;
                 }
                 if (selectedIndex == 1) {

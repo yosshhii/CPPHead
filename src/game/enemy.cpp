@@ -1,162 +1,175 @@
 #include "enemy.hpp"
 
-#include <iostream>
-
-#include "background.hpp"
-#include "player.hpp"
-
-Enemy::Enemy(sf::Texture& idleTexture, sf::Texture& walkTexture, sf::Vector2f position)
-: sprite(idleTexture), idleTexture(&idleTexture), walkTexture(&walkTexture), health(1), speed(50.f), position(position) {
+Enemy::Enemy(EnemyTextures textures, EnemyStats stats, sf::Vector2f position)
+    : textures(textures), stats(stats), currentHealth(stats.health), position(position), sprite(*textures.idle)
+{
     sprite.setOrigin({static_cast<float>(frameWidth) / 2.f, static_cast<float>(frameHeight) - footFixY});
     sprite.setPosition(position);
     sprite.setScale({enemyScaleX, enemyScaleY});
-    sprite.setTextureRect(sf::IntRect(
-                {0, 0},
-                {frameWidth, frameHeight}));
+    sprite.setTextureRect(sf::IntRect({0, 0}, {frameWidth, frameHeight}));
+}
+
+void Enemy::setState(State newState) {
+    if (state == newState) return;
+    state = newState;
+    animationTimer = 0.f;
+    idleFrame = 0;
+    walkFrame = 0;
+    attackFrame = 0;
+    hurtFrame = 0;
 }
 
 void Enemy::update(float dt, sf::Vector2f playerPos) {
-    bool isMoving = false;
+    if (!isAlive) return;
 
-    if (!isOnGround) {
+    if (!isOnGround)
         velocityY += 900.f * dt;
-    }
-
     position.y += velocityY * dt;
 
-    float distance = std::sqrt(std::pow(playerPos.x - position.x, 2) + std::pow(playerPos.y - position.y, 2));
+    attackCooldownTimer = std::min(attackCooldownTimer + dt, stats.attackCooldown);
 
-    if (distance <= chaseRadius) {
-        sf::Vector2f direction = playerPos - position;
-        float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-        direction.x /= length; // нормализуем вектор
+    float dx = playerPos.x - position.x;
+    float dy = playerPos.y - position.y;
+    float distance = std::sqrt(dx * dx + dy * dy);
 
-        if (direction.x < 0) {
-            sprite.setScale({enemyScaleX, enemyScaleY});
-        } else {sprite.setScale({-enemyScaleX, enemyScaleY});}
+    if (distance <= stats.chaseRadius)
+        facingScaleX = (dx < 0) ? enemyScaleX : -enemyScaleX;
 
-        position.x += direction.x * speed * dt;
-        isMoving = true;
+    if (state == State::Hurt) {
+        hurtTimer += dt;
+        if (hurtTimer >= 0.4f)
+            setState(State::Idle);
+        updateAnimation(dt);
+        sprite.setScale({facingScaleX, enemyScaleY});
+        sprite.setPosition(position);
+        return;
     }
 
-    updateAnimation(dt, isMoving);
+    if (state == State::Attacking) {
+        updateAnimation(dt);
+        sprite.setScale({facingScaleX, enemyScaleY});
+        sprite.setPosition(position);
+        return;
+    }
 
+    if (distance <= stats.attackRadius && attackCooldownTimer >= stats.attackCooldown) {
+        attackCooldownTimer = 0.f;
+        damageDealtThisAttack = false;
+        setState(State::Attacking);
+    } else if (distance <= stats.chaseRadius) {
+        setState(State::Chasing);
+        float len = std::sqrt(dx * dx + dy * dy);
+        position.x += (dx / len) * stats.speed * dt;
+    } else {
+        setState(State::Idle);
+    }
+
+    updateAnimation(dt);
+    sprite.setScale({facingScaleX, enemyScaleY});
     sprite.setPosition(position);
 }
 
-void Enemy::updateAnimation(float dt, bool isMoving) {
-    if (isMoving) {
-        idleFrame = 0;
-        animationTimer += dt;
-        sprite.setTexture(*walkTexture);
+void Enemy::updateAnimation(float dt) {
+    const float baseSpeed = 0.12f;
+    animationTimer += dt;
 
-        if (animationTimer >= animationSpeed) {
-            animationTimer = 0.f;
-            walkFrame = (walkFrame + 1) % walkFramesCount;
-        }
+    switch (state) {
+        case State::Idle:
+            sprite.setTexture(*textures.idle);
+            if (animationTimer >= baseSpeed) {
+                animationTimer = 0.f;
+                idleFrame = (idleFrame + 1) % stats.idleFramesCount;
+            }
+            sprite.setTextureRect(sf::IntRect({idleFrame * frameWidth, 0}, {frameWidth, frameHeight}));
+            break;
 
-        sprite.setTextureRect(sf::IntRect(
-        {walkFrame * frameWidth, 0},
-        {frameWidth, frameHeight}
-        ));
-    } else {
-        walkFrame = 0;
-        animationTimer += dt;
-        sprite.setTexture(*idleTexture);
+        case State::Chasing:
+            sprite.setTexture(*textures.walk);
+            if (animationTimer >= baseSpeed) {
+                animationTimer = 0.f;
+                walkFrame = (walkFrame + 1) % stats.walkFramesCount;
+            }
+            sprite.setTextureRect(sf::IntRect({walkFrame * frameWidth, 0}, {frameWidth, frameHeight}));
+            break;
 
-        if (animationTimer >= animationSpeed) {
-            animationTimer = 0.f;
-            idleFrame = (idleFrame + 1) % idleFramesCount;
-        }
+        case State::Attacking:
+            sprite.setTexture(*textures.attack);
+            if (animationTimer >= stats.attackAnimSpeed) {
+                animationTimer = 0.f;
+                attackFrame++;
+                if (attackFrame >= stats.attackFramesCount) {
+                    setState(State::Idle);
+                    return;
+                }
+            }
+            sprite.setTextureRect(sf::IntRect({attackFrame * frameWidth, 0}, {frameWidth, frameHeight}));
+            break;
 
-        sprite.setTextureRect(sf::IntRect(
-        {idleFrame * frameWidth, 0},
-        {frameWidth, frameHeight}
-        ));
+        case State::Hurt:
+            sprite.setTexture(*textures.hurt);
+            if (animationTimer >= baseSpeed) {
+                animationTimer = 0.f;
+                hurtFrame = (hurtFrame + 1) % stats.hurtFramesCount;
+            }
+            sprite.setTextureRect(sf::IntRect({hurtFrame * frameWidth, 0}, {frameWidth, frameHeight}));
+            break;
     }
-
 }
 
-bool Enemy::canAttack(sf::Vector2f playerCenter) const {
-    sf::Vector2f enemyCenter = getHitboxCenter();
+bool Enemy::shouldDealDamage() const {
+    return state == State::Attacking &&
+           !damageDealtThisAttack &&
+           attackFrame >= stats.attackFramesCount / 2;
+}
 
-    float attackWidth = 70.f;
-    float attackHeight = 70.f;
+void Enemy::markDamageDealt() {
+    damageDealtThisAttack = true;
+}
 
-    bool insideX =
-        playerCenter.x >= enemyCenter.x - attackWidth / 2.f &&
-        playerCenter.x <= enemyCenter.x + attackWidth / 2.f;
-
-    bool insideY =
-        playerCenter.y >= enemyCenter.y - attackHeight / 2.f &&
-        playerCenter.y <= enemyCenter.y + attackHeight / 2.f;
-
-    return insideX && insideY;
+int Enemy::getDamage() const {
+    return stats.damage;
 }
 
 void Enemy::takeDamage(int damage) {
-     if (getIsAlive()) {
-        health -= damage;
-         if (health <= 0) {
-             death();
-         }
-     }
+    if (!isAlive) return;
+    currentHealth -= damage;
+    if (currentHealth <= 0) {
+        isAlive = false;
+        return;
+    }
+    state = State::Hurt;
+    hurtFrame = 0;
+    hurtTimer = 0.f;
+    animationTimer = 0.f;
 }
 
 sf::Vector2f Enemy::getHitboxCenter() const {
     return {
         position.x,
-        position.y - (static_cast<float>(frameHeight) * sprite.getScale().y) / 2.f
+        position.y - (static_cast<float>(frameHeight) * std::abs(sprite.getScale().y)) / 2.f
     };
 }
 
-void Enemy::death() {
-    isAlive = false;
-}
+bool Enemy::getIsAlive() const { return isAlive; }
 
-bool Enemy::getIsAlive() const {
-    return isAlive;
-}
+sf::Sprite Enemy::getSprite() const { return sprite; }
 
-sf::Sprite Enemy::getSprite() {
-    return sprite;
-}
-
-sf::Vector2f Enemy::getPosition() const {
-    return position;
-}
+sf::Vector2f Enemy::getPosition() const { return position; }
 
 void Enemy::setPosition(sf::Vector2f pos) {
     position = pos;
     sprite.setPosition(pos);
 }
 
-void Enemy::setVelocityY(float velocity) {
-    velocityY = velocity;
-}
+void Enemy::setVelocityY(float velocity) { velocityY = velocity; }
 
-void Enemy::setOnGround(bool value) {
-    isOnGround = value;
-}
+void Enemy::setOnGround(bool value) { isOnGround = value; }
 
-float Enemy::getAttackRadius() const {
-    return attackRadius;
-}
-
-sf::Vector2f Enemy::getScale() const {
-    return sprite.getScale();
-}
+sf::Vector2f Enemy::getScale() const { return sprite.getScale(); }
 
 Hitbox Enemy::getBodyHitbox() const {
     float width = 45.f;
     float height = 80.f;
-
     sf::Vector2f center = getHitboxCenter();
-
-    return {
-        center.x - width / 2.f,
-        center.y - height / 2.f,
-        width,
-        height
-    };
+    return {center.x - width / 2.f, center.y - height / 2.f, width, height};
 }
